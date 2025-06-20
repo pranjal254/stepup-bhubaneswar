@@ -12,39 +12,44 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 export default function Contact() {
   const [expandedFaq, setExpandedFaq] = useState(null);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
+  const router = useRouter();
 
   const contactMethods = [
     {
-      icon: <MessageCircle className="w-6 h-6 text-green-500" />,
+      icon: <MessageCircle className="w-6 h-6 text-white" />,
       title: "WhatsApp",
       description: "Quick responses for urgent queries",
       action: "Message Us",
-      value: "+91 98765 43210",
+      value: "+91 9131425965",
+      href: "https://wa.me/919131425965",
       primary: true,
       color: "from-green-500 to-emerald-500",
       bgColor: "from-green-50 to-emerald-50",
     },
     {
-      icon: <Mail className="w-6 h-6 text-blue-500" />,
+      icon: <Mail className="w-6 h-6 text-white" />,
       title: "Email",
       description: "Detailed inquiries and collaborations",
       action: "Send Email",
       value: "hello@stepupbhubaneswar.com",
+      href: "mailto:hello@stepupbhubaneswar.com",
       primary: false,
       color: "from-blue-500 to-indigo-500",
       bgColor: "from-blue-50 to-indigo-50",
     },
     {
-      icon: <Phone className="w-6 h-6 text-purple-500" />,
+      icon: <Phone className="w-6 h-6 text-white" />,
       title: "Phone",
       description: "Direct calls during business hours",
       action: "Call Now",
-      value: "+91 98765 43210",
+      value: "+91 98765-43210",
+      href: "tel:+919876543210",
       primary: false,
       color: "from-purple-500 to-violet-500",
       bgColor: "from-purple-50 to-violet-50",
@@ -131,6 +136,10 @@ export default function Contact() {
         ease: "easeOut",
       },
     },
+  };
+
+  const handleRedirect = (link) => {
+    window.open(link, "_blank");
   };
 
   return (
@@ -258,6 +267,7 @@ export default function Contact() {
                         {method.value}
                       </p>
                       <motion.button
+                        onClick={() => handleRedirect(method.href)}
                         className={`text-sm font-medium transition-colors ${
                           method.primary
                             ? "text-green-600 hover:text-green-700"
@@ -546,6 +556,7 @@ export default function Contact() {
                     className="bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full font-medium hover:bg-white/30 transition-colors"
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
+                    onClick={() => router.push("/register")}
                   >
                     Join WhatsApp Community
                   </motion.button>

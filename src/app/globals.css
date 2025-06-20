@@ -47,6 +47,51 @@
   .focus-visible {
     @apply outline-none ring-2 ring-orange-500 ring-offset-2;
   }
+  
+  /* Mobile animation safety - CRITICAL FIX */
+  @media (max-width: 768px) {
+    /* Ensure all framer-motion elements are visible on mobile */
+    [data-framer-motion] {
+      opacity: 1 !important;
+      transform: none !important;
+      animation: fadeInMobile 0.6s ease-out;
+    }
+    
+    /* Force visibility for problematic sections */
+    #about,
+    #workshops {
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    
+    /* Disable complex transforms on mobile */
+    .motion-safe {
+      transform: none !important;
+    }
+  }
+  
+  /* Mobile fade-in animation */
+  @keyframes fadeInMobile {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+@layer utilities {
+  /* Mobile-first visibility utilities */
+  @media (max-width: 768px) {
+    .mobile-visible {
+      opacity: 1 !important;
+      transform: none !important;
+      display: block !important;
+    }
+  }
 }
 
 @layer components {

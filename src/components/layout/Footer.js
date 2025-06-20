@@ -19,14 +19,14 @@ export default function Footer() {
   const socialLinks = [
     { 
       name: 'Instagram', 
-      href: 'https://instagram.com/stepupbhubaneswar',
+      href: 'https://www.instagram.com/stepup_bhubaneswar/',
       icon: <Instagram size={20} />,
       color: 'hover:text-pink-500',
       bgColor: 'hover:bg-pink-100'
     },
     { 
       name: 'WhatsApp', 
-      href: 'https://wa.me/919876543210',
+      href: 'https://wa.me/919131425965',
       icon: <MessageCircle size={20} />,
       color: 'hover:text-green-500',
       bgColor: 'hover:bg-green-100'
@@ -253,7 +253,7 @@ export default function Footer() {
                   href="https://wa.me/919876543210" 
                   className="text-gray-300 hover:text-green-400 transition-colors"
                 >
-                  +91 98765 43210
+                  +91 9131425965
                 </a>
               </motion.div>
               <motion.div

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { Calendar, MapPin, Users, Clock, Star, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
@@ -8,7 +8,29 @@ import { motion, AnimatePresence, useInView } from 'framer-motion'
 export default function Workshops() {
   const [activeFilter, setActiveFilter] = useState('all')
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.2 })
+  const isInView = useInView(ref, { 
+    once: true, 
+    amount: 0.1,
+    margin: "0px 0px -100px 0px"
+  })
+  
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
+
+  // Use fallback animation state on mobile  
+  const shouldAnimate = isMobile ? true : isInView
 
   const workshops = [
     {
@@ -115,69 +137,18 @@ export default function Workshops() {
     }
   }
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
-  }
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  }
-
-  const cardVariants = {
-    hidden: { opacity: 0, y: 50, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
-    }
-  }
-
-  const filterVariants = {
-    inactive: { scale: 1, y: 0 },
-    active: { 
-      scale: 1.05, 
-      y: -2,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 17
-      }
-    }
-  }
-
   return (
-    <section id="workshops" className="py-24 bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50 overflow-hidden" ref={ref}>
+    <section id="workshops" className="py-24 bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50 overflow-hidden mobile-visible" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div 
           className="text-center space-y-6 mb-16"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          initial={{ opacity: 0, y: 30 }}
+          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.div 
             className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 border border-orange-200"
-            variants={itemVariants}
             whileHover={{ scale: 1.05, y: -2 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
@@ -187,14 +158,18 @@ export default function Workshops() {
           
           <motion.h2 
             className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 30 }}
+            animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           >
             Learn from <span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">India's Best</span>
           </motion.h2>
           
           <motion.p 
             className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
-            variants={itemVariants}
+            initial={{ opacity: 0, y: 20 }}
+            animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
             Curated workshops with top choreographers from across India. Each session is designed to challenge, inspire, and elevate your dance journey.
           </motion.p>
@@ -203,34 +178,34 @@ export default function Workshops() {
         {/* Filter Tabs */}
         <motion.div 
           className="flex flex-wrap justify-center gap-3 mb-12"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          initial={{ opacity: 0, y: 20 }}
+          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
         >
           {categories.map((category, index) => (
             <motion.button
               key={category.id}
               onClick={() => setActiveFilter(category.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center space-x-2 ${
+              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center space-x-2 relative ${
                 activeFilter === category.id
                   ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg'
                   : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-md border border-gray-200'
               }`}
-              variants={filterVariants}
               initial={{ opacity: 0, y: 20 }}
-              animate={{ 
-                opacity: 1, 
-                y: 0,
-                transition: { 
-                  duration: 0.5, 
-                  delay: index * 0.1 
-                }
-              }}
-              whileHover="active"
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+              whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-lg">{category.icon}</span>
+              <motion.span 
+                className="text-lg"
+                animate={{ rotate: activeFilter === category.id ? [0, 10, -10, 0] : 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                {category.icon}
+              </motion.span>
               <span>{category.name}</span>
+              
               {activeFilter === category.id && (
                 <motion.div
                   layoutId="activeFilter"
@@ -245,18 +220,19 @@ export default function Workshops() {
         {/* Workshops Grid */}
         <motion.div 
           className="grid lg:grid-cols-2 gap-8 mb-12"
-          layout
+          initial={{ opacity: 0 }}
+          animate={shouldAnimate ? { opacity: 1 } : { opacity: 0 }}
+          transition={{ duration: 0.8, delay: 0.7 }}
         >
           <AnimatePresence mode="wait">
             {filteredWorkshops.map((workshop, index) => (
               <motion.div
                 key={workshop.id}
                 className="group relative bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
-                variants={cardVariants}
-                initial="hidden"
-                animate="visible"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.3 } }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: index * 0.1, duration: 0.6 }}
                 whileHover={{ 
                   y: -10, 
                   scale: 1.02,
@@ -372,12 +348,7 @@ export default function Workshops() {
                   </div>
 
                   {/* Workshop Details */}
-                  <motion.div 
-                    className="grid grid-cols-2 gap-4"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                  >
+                  <div className="grid grid-cols-2 gap-4">
                     {[
                       { icon: Calendar, text: workshop.date },
                       { icon: Clock, text: workshop.time },
@@ -387,7 +358,6 @@ export default function Workshops() {
                       <motion.div 
                         key={idx}
                         className="flex items-center space-x-2 text-sm text-gray-600"
-                        variants={itemVariants}
                         whileHover={{ x: 3, color: "#ea580c" }}
                         transition={{ duration: 0.2 }}
                       >
@@ -395,7 +365,7 @@ export default function Workshops() {
                         <span>{detail.text}</span>
                       </motion.div>
                     ))}
-                  </motion.div>
+                  </div>
 
                   {/* Pricing and Action */}
                   <motion.div 
@@ -464,8 +434,8 @@ export default function Workshops() {
         <motion.div 
           className="text-center bg-white rounded-3xl p-12 shadow-lg border border-gray-100"
           initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
+          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
           whileHover={{ 
             y: -5,
             transition: { duration: 0.3 }
@@ -475,16 +445,16 @@ export default function Workshops() {
             <motion.h3 
               className="text-3xl font-bold text-gray-900"
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.7 }}
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
             >
               Don't see your favorite style?
             </motion.h3>
             <motion.p 
               className="text-lg text-gray-600 max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.8 }}
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 1.0 }}
             >
               We're constantly adding new workshops and bringing diverse choreographers to Bhubaneswar. 
               Let us know what you'd love to learn next!
@@ -492,14 +462,14 @@ export default function Workshops() {
             <motion.div 
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 20 }}
-              animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-              transition={{ duration: 0.6, delay: 0.9 }}
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+              transition={{ duration: 0.6, delay: 1.1 }}
             >
               <motion.div
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Link href="/contact" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300">
+                <Link href="#contact" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300">
                   Request a Workshop
                 </Link>
               </motion.div>
@@ -507,7 +477,7 @@ export default function Workshops() {
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Link href="/gallery" className="border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-full font-medium hover:bg-orange-500 hover:text-white transition-all duration-300">
+                <Link href="#gallery" className="border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-full font-medium hover:bg-orange-500 hover:text-white transition-all duration-300">
                   View Past Workshops
                 </Link>
               </motion.div>

@@ -458,16 +458,11 @@ export default function Gallery() {
                 className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={()=>window.open("https://www.instagram.com/stepup_bhubaneswar/", "_blank")}
               >
-                Join Next Workshop
+                 Follow on Instagram
               </motion.button>
-              <motion.button 
-                className="border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-full font-medium hover:bg-orange-500 hover:text-white transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Follow on Instagram
-              </motion.button>
+              
             </motion.div>
           </div>
         </motion.div>

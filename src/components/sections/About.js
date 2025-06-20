@@ -1,20 +1,40 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { Heart, Star, Users, Zap, Target, Sparkles, Music, Award } from 'lucide-react'
 import { motion, useInView, useScroll, useTransform } from 'framer-motion'
 
 export default function About() {
   const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, amount: 0.3 })
+  const isInView = useInView(ref, { 
+    once: true, 
+    amount: 0.1,
+    margin: "0px 0px -100px 0px"
+  })
+  
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
   })
 
-  // Parallax effects
-  const y = useTransform(scrollYProgress, [0, 1], [0, -50])
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.4, 1, 1, 0.4])
+  // Parallax effects (disabled on mobile for performance)
+  const y = isMobile ? 0 : useTransform(scrollYProgress, [0, 1], [0, -50])
+  const opacity = isMobile ? 1 : useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.4, 1, 1, 0.4])
 
   const features = [
     {
@@ -53,9 +73,9 @@ export default function About() {
 
   const stats = [
     { number: "2024", label: "Founded", icon: <Target className="w-6 h-6" /> },
-    { number: "10+", label: "Workshops", icon: <Music className="w-6 h-6" /> },
-    { number: "15+", label: "Choreographers", icon: <Award className="w-6 h-6" /> },
-    { number: "200+", label: "Happy Dancers", icon: <Sparkles className="w-6 h-6" /> }
+    { number: "50+", label: "Workshops", icon: <Music className="w-6 h-6" /> },
+    { number: "25+", label: "Choreographers", icon: <Award className="w-6 h-6" /> },
+    { number: "1000+", label: "Happy Dancers", icon: <Sparkles className="w-6 h-6" /> }
   ]
 
   // Animation variants
@@ -107,8 +127,11 @@ export default function About() {
     }
   }
 
+  // Determine if we should animate or show immediately
+  const shouldAnimate = isMobile ? true : isInView
+
   return (
-    <section id="about" className="py-24 bg-white relative overflow-hidden" ref={ref}>
+    <section id="about" className="py-24 bg-white relative overflow-hidden mobile-visible" ref={ref}>
       {/* Background Decorative Elements */}
       <motion.div
         className="absolute top-20 right-10 w-32 h-32 bg-gradient-to-r from-orange-200 to-pink-200 rounded-full opacity-20"
@@ -129,11 +152,11 @@ export default function About() {
           {/* Left Content */}
           <motion.div 
             className="space-y-8"
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
+            initial={{ opacity: 0, y: 20 }}
+            animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
           >
-            <motion.div className="space-y-6" variants={itemVariants}>
+            <div className="space-y-6">
               <motion.div 
                 className="inline-flex items-center space-x-2 bg-orange-50 rounded-full px-4 py-2 border border-orange-200"
                 whileHover={{ scale: 1.05, y: -2 }}
@@ -149,7 +172,9 @@ export default function About() {
               
               <motion.h2 
                 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
-                variants={itemVariants}
+                initial={{ opacity: 0, y: 30 }}
+                animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                transition={{ duration: 0.8, delay: 0.3 }}
               >
                 Where{" "}
                 <motion.span 
@@ -171,35 +196,42 @@ export default function About() {
               
               <motion.p 
                 className="text-lg text-gray-600 leading-relaxed"
-                variants={itemVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
               >
                 Step Up Bhubaneswar is Odisha's first curated dance workshop platform designed for anyone who loves to dance — no age, no experience limit. We bring top choreographers from across India to Bhubaneswar for high-energy, weekend-based dance sessions.
               </motion.p>
               
               <motion.p 
                 className="text-lg text-gray-600 leading-relaxed"
-                variants={itemVariants}
+                initial={{ opacity: 0, y: 20 }}
+                animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.6, delay: 0.5 }}
               >
                 Whether you're a working professional, a student, or a homemaker, our workshops are crafted to inspire movement, joy, and community. More than a class — it's a celebration of dance for the people, by the people.
               </motion.p>
-            </motion.div>
+            </div>
 
             {/* Stats Section */}
-            <motion.div 
-              className="grid grid-cols-2 sm:grid-cols-4 gap-6"
-              variants={containerVariants}
-            >
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
                 <motion.div
                   key={stat.label}
                   className="text-center group"
-                  variants={itemVariants}
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={shouldAnimate ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+                  transition={{ 
+                    duration: 0.5, 
+                    delay: 0.6 + index * 0.1,
+                    type: "spring",
+                    stiffness: 200
+                  }}
                   whileHover={{ 
                     scale: 1.1, 
                     y: -5,
                     transition: { duration: 0.2 }
                   }}
-                  custom={index}
                 >
                   <motion.div 
                     className="w-12 h-12 bg-gradient-to-r from-orange-100 to-pink-100 rounded-xl flex items-center justify-center mx-auto mb-2 group-hover:from-orange-200 group-hover:to-pink-200 transition-all duration-300"
@@ -210,28 +242,20 @@ export default function About() {
                       {stat.icon}
                     </motion.div>
                   </motion.div>
-                  <motion.div 
-                    className="text-2xl font-bold text-gray-900 group-hover:text-orange-500 transition-colors duration-300"
-                    initial={{ scale: 0 }}
-                    animate={isInView ? { scale: 1 } : { scale: 0 }}
-                    transition={{ 
-                      duration: 0.5, 
-                      delay: 0.5 + index * 0.1,
-                      type: "spring",
-                      stiffness: 200
-                    }}
-                  >
+                  <div className="text-2xl font-bold text-gray-900 group-hover:text-orange-500 transition-colors duration-300">
                     {stat.number}
-                  </motion.div>
+                  </div>
                   <div className="text-sm text-gray-600">{stat.label}</div>
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
 
             {/* Vision Card */}
             <motion.div 
               className="bg-gradient-to-r from-orange-50 to-pink-50 rounded-2xl p-6 border border-orange-100 relative overflow-hidden"
-              variants={cardVariants}
+              initial={{ opacity: 0, y: 30 }}
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
               whileHover={{ 
                 scale: 1.02,
                 y: -5,
@@ -260,8 +284,8 @@ export default function About() {
               <motion.p 
                 className="text-gray-700 leading-relaxed relative z-10"
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                transition={{ duration: 0.6, delay: 0.8 }}
+                animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.6, delay: 0.9 }}
               >
                 To make Bhubaneswar a cultural dance hub that connects passionate individuals — regardless of age or background — with India's finest choreographers, building a vibrant, inclusive dance culture where every workshop inspires a spark.
               </motion.p>
@@ -271,20 +295,18 @@ export default function About() {
           {/* Right Content - Features Grid */}
           <motion.div 
             className="space-y-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate={isInView ? "visible" : "hidden"}
+            initial={{ opacity: 0, x: 30 }}
+            animate={shouldAnimate ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <motion.div 
-              className="grid grid-cols-1 sm:grid-cols-2 gap-6"
-              variants={containerVariants}
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
                   className={`bg-gradient-to-br ${feature.bgColor} rounded-2xl p-6 border border-gray-100 group relative overflow-hidden`}
-                  variants={cardVariants}
-                  custom={feature.delay}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+                  transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
                   whileHover={{ 
                     scale: 1.05,
                     y: -10,
@@ -353,10 +375,10 @@ export default function About() {
                       <motion.p 
                         className="text-gray-600 text-sm leading-relaxed"
                         initial={{ opacity: 0, y: 10 }}
-                        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
+                        animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
                         transition={{ 
                           duration: 0.5, 
-                          delay: 0.5 + index * 0.1 
+                          delay: 0.6 + index * 0.1 
                         }}
                       >
                         {feature.description}
@@ -371,12 +393,14 @@ export default function About() {
                   />
                 </motion.div>
               ))}
-            </motion.div>
+            </div>
 
             {/* Quote Section */}
             <motion.div 
               className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-8 border border-purple-100 relative overflow-hidden"
-              variants={cardVariants}
+              initial={{ opacity: 0, y: 30 }}
+              animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+              transition={{ duration: 0.6, delay: 1 }}
               whileHover={{ 
                 scale: 1.02,
                 y: -5,
@@ -387,7 +411,7 @@ export default function About() {
               <motion.div
                 className="absolute top-4 left-4 text-6xl text-purple-200 font-serif"
                 initial={{ opacity: 0, scale: 0 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+                animate={shouldAnimate ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
                 transition={{ duration: 0.5, delay: 1.2 }}
               >
                 "
@@ -396,8 +420,8 @@ export default function About() {
               <motion.blockquote 
                 className="text-lg font-medium text-gray-900 italic mb-4 relative z-10"
                 initial={{ opacity: 0, y: 20 }}
-                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                transition={{ duration: 0.6, delay: 1 }}
+                animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ duration: 0.6, delay: 1.1 }}
               >
                 Dance is not just for dancers. It's for everyone who feels the rhythm.
               </motion.blockquote>
@@ -405,8 +429,8 @@ export default function About() {
               <motion.div 
                 className="flex items-center space-x-3 relative z-10"
                 initial={{ opacity: 0, x: -20 }}
-                animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
-                transition={{ duration: 0.6, delay: 1.1 }}
+                animate={shouldAnimate ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
               >
                 <motion.div 
                   className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
