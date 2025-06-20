@@ -173,7 +173,7 @@ export default function Hero() {
 
             {/* Stats */}
             <motion.div 
-              className="grid grid-cols-3 gap-6"
+              className="grid grid-cols-3 gap-6 mb-4"
               variants={containerVariants}
             >
               {[
@@ -207,8 +207,9 @@ export default function Hero() {
             </motion.div>
 
             {/* CTA Buttons */}
+            <br/>
             <motion.div 
-              className="flex flex-col sm:flex-row gap-4"
+              className="flex flex-col sm:flex-row gap-8"
               variants={itemVariants}
             >
               <motion.div
@@ -216,11 +217,11 @@ export default function Hero() {
                 whileTap={{ scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <Link href="/workshops" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300">
+                <Link href="#workshops" className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300">
                   Explore Workshops
                 </Link>
               </motion.div>
-              <motion.button 
+              {/* <motion.button 
                 className="border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-full font-medium hover:bg-orange-500 hover:text-white transition-all duration-300 flex items-center justify-center space-x-2"
                 whileHover={{ scale: 1.05, y: -2 }}
                 whileTap={{ scale: 0.95 }}
@@ -233,7 +234,7 @@ export default function Hero() {
                   <Play size={20} />
                 </motion.div>
                 <span>Watch Our Story</span>
-              </motion.button>
+              </motion.button> */}
             </motion.div>
           </motion.div>
 
