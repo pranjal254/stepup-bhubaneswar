@@ -9,6 +9,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,8 +31,24 @@ export default function Header() {
       }
     }
     
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+      // Close mobile menu on resize to desktop
+      if (window.innerWidth >= 768) {
+        setIsMenuOpen(false)
+      }
+    }
+    
+    // Initial check
+    handleResize()
+    
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleResize)
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
+    }
   }, [])
 
   const navigation = [
@@ -44,18 +61,44 @@ export default function Header() {
 
   const handleSmoothScroll = (e, targetId) => {
     e.preventDefault()
+    console.log('Scrolling to:', targetId) // Debug log
     setIsMenuOpen(false)
     
-    const targetElement = document.getElementById(targetId)
-    if (targetElement) {
-      const headerHeight = 64 // Height of fixed header
-      const targetPosition = targetElement.offsetTop - headerHeight
+    // Small delay to allow mobile menu to close first
+    setTimeout(() => {
+      const targetElement = document.getElementById(targetId)
+      console.log('Target element found:', !!targetElement) // Debug log
       
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'smooth'
-      })
-    }
+      if (targetElement) {
+        const headerHeight = 64 // Height of fixed header
+        const extraOffset = isMobile ? 20 : 0 // Extra offset for mobile
+        const targetPosition = targetElement.offsetTop - headerHeight - extraOffset
+        
+        console.log('Scrolling to position:', targetPosition) // Debug log
+        
+        // Try modern smooth scroll first
+        try {
+          window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+          })
+        } catch (error) {
+          // Fallback for older mobile browsers
+          console.log('Fallback scroll') // Debug log
+          window.scrollTo(0, targetPosition)
+        }
+        
+        // Additional fallback - force scroll after a delay
+        setTimeout(() => {
+          if (Math.abs(window.scrollY - targetPosition) > 50) {
+            console.log('Force scroll correction') // Debug log
+            window.scrollTo(0, targetPosition)
+          }
+        }, 1000)
+      } else {
+        console.error('Target element not found:', targetId) // Debug log
+      }
+    }, isMobile ? 300 : 0) // Delay on mobile to let menu close
   }
 
   return (
@@ -201,7 +244,11 @@ export default function Header() {
                 <motion.a
                   key={item.name}
                   href={item.href}
-                  onClick={(e) => handleSmoothScroll(e, item.id)}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    console.log('Mobile nav clicked:', item.id) // Debug log
+                    handleSmoothScroll(e, item.id)
+                  }}
                   className={`block font-medium py-2 transition-all duration-300 ${
                     activeSection === item.id 
                       ? 'text-orange-500 border-l-2 border-orange-500 pl-3' 

@@ -11,7 +11,7 @@
   
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 4rem; /* Account for fixed header */
+    scroll-padding-top: 5rem; /* Account for fixed header + extra space */
   }
   
   html,
@@ -68,6 +68,16 @@
     .motion-safe {
       transform: none !important;
     }
+    
+    /* Better mobile scroll padding */
+    html {
+      scroll-padding-top: 6rem;
+    }
+    
+    /* Ensure mobile menu works properly */
+    .mobile-menu-open {
+      overflow: hidden;
+    }
   }
   
   /* Mobile fade-in animation */
@@ -91,6 +101,11 @@
       transform: none !important;
       display: block !important;
     }
+  }
+  
+  /* Smooth scroll utilities */
+  .scroll-smooth {
+    scroll-behavior: smooth;
   }
 }
 
