@@ -205,6 +205,7 @@ export default function Hero() {
                 </motion.div>
               ))}
             </motion.div>
+            
 
             {/* CTA Buttons */}
             <br/>
