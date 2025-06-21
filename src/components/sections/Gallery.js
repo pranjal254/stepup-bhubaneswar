@@ -463,6 +463,7 @@ export default function Gallery() {
                  Follow on Instagram
               </motion.button>
               
+              
             </motion.div>
           </div>
         </motion.div>
