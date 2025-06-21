@@ -26,7 +26,7 @@ export default function Footer() {
     },
     { 
       name: 'WhatsApp', 
-      href: 'https://wa.me/919131425965',
+      href: 'https://wa.me/917749019313',
       icon: <MessageCircle size={20} />,
       color: 'hover:text-green-500',
       bgColor: 'hover:bg-green-100'
@@ -253,7 +253,7 @@ export default function Footer() {
                   href="https://wa.me/919876543210" 
                   className="text-gray-300 hover:text-green-400 transition-colors"
                 >
-                  +91 9131425965
+                  +91 7749019313
                 </a>
               </motion.div>
               <motion.div
