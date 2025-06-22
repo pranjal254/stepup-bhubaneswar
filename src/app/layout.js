@@ -128,7 +128,7 @@ export default function RootLayout({ children }) {
                 "longitude": "85.8245"
               },
               "telephone": "+91-7749019313",
-              "email": "hello@stepupbhubaneswar.com",
+              "email": "info.stepupbhubaneswar@gmail.com",
               "sameAs": [
                 "https://instagram.com/stepup_bhubaneswar",
                 "https://wa.me/917749019313"

@@ -35,50 +35,15 @@ export default function Workshops() {
   const shouldAnimate = isMobile ? true : isInView;
 
   const workshops = [
-    {
-      id: 1,
-      title: "Hip Hop Intensive",
-      choreographer: "Rahul Shetty",
-      location: "Mumbai",
-      date: "July 15-16, 2025",
-      time: "10:00 AM - 6:00 PM",
-      price: "₹1,500",
-      slotsLeft: 3,
-      totalSlots: 30,
-      level: "Beginner to Intermediate",
-      category: "hip-hop",
-      status: "filling-fast",
-      image: "/api/placeholder/400/300",
-      description:
-        "High-energy hip hop workshop focusing on popping, locking, and street style choreography.",
-      color: "from-orange-500 to-red-500",
-    },
-    {
-      id: 2,
-      title: "Contemporary Flow",
-      choreographer: "Priya Sharma",
-      location: "Delhi",
-      date: "July 22-23, 2025",
-      time: "11:00 AM - 5:00 PM",
-      price: "₹1,800",
-      slotsLeft: 12,
-      totalSlots: 25,
-      level: "All Levels",
-      category: "contemporary",
-      status: "available",
-      image: "/api/placeholder/400/300",
-      description:
-        "Express your emotions through fluid contemporary movements and storytelling.",
-      color: "from-purple-500 to-pink-500",
-    },
+    
     {
       id: 3,
       title: "Bollywood Masala",
-      choreographer: "Arjun Kapoor",
-      location: "Pune",
+      choreographer: "Vikas Paudel",
+      location: "Mumbai",
       date: "August 5-6, 2025",
-      time: "9:00 AM - 7:00 PM",
-      price: "₹1,200",
+      time: "11:00 AM - 5:00 PM",
+      price: "₹799",
       slotsLeft: 18,
       totalSlots: 40,
       level: "Beginner Friendly",
@@ -89,24 +54,8 @@ export default function Workshops() {
         "Classic and modern Bollywood choreography with high-energy routines.",
       color: "from-yellow-500 to-orange-500",
     },
-    {
-      id: 4,
-      title: "Latin Fusion",
-      choreographer: "Maria Rodriguez",
-      location: "Bangalore",
-      date: "August 12-13, 2025",
-      time: "10:30 AM - 5:30 PM",
-      price: "₹2,000",
-      slotsLeft: 8,
-      totalSlots: 20,
-      level: "Intermediate",
-      category: "latin",
-      status: "available",
-      image: "/api/placeholder/400/300",
-      description:
-        "Salsa, bachata, and reggaeton fusion for an explosive dance experience.",
-      color: "from-pink-500 to-purple-500",
-    },
+   
+    
   ];
 
   const categories = [

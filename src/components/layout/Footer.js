@@ -33,7 +33,7 @@ export default function Footer() {
     },
     { 
       name: 'Email', 
-      href: 'mailto:hello@stepupbhubaneswar.com',
+      href: 'mailto:info.stepupbhubaneswar@gmail.com',
       icon: <Mail size={20} />,
       color: 'hover:text-blue-500',
       bgColor: 'hover:bg-blue-100'
@@ -262,10 +262,10 @@ export default function Footer() {
               >
                 <p className="text-gray-400 text-sm">Email</p>
                 <a 
-                  href="mailto:hello@stepupbhubaneswar.com" 
+                  href="mailto:info.stepupbhubaneswar@gmail.com" 
                   className="text-gray-300 hover:text-blue-400 transition-colors"
                 >
-                  hello@stepupbhubaneswar.com
+                  info.stepupbhubaneswar@gmail.com
                 </a>
               </motion.div>
               <motion.div
