@@ -183,7 +183,7 @@ export default function RegisterPage() {
           </div>
         </motion.div>
 
-        {/* Progress Indicator */}
+      
         <motion.div
           className="flex flex-col items-center mb-12"
           initial={{ opacity: 0 }}
