@@ -91,7 +91,7 @@ stepup-bhubaneswar/
 
 The current payment system uses UPI with screenshot verification:
 
-1. **UPI Payment**: Users pay via UPI to `stepupbhubaneswar@paytm`
+1. **UPI Payment**: Users pay via UPI to `9438363399@ybl`
 2. **Screenshot Verification**: Users send payment screenshot to WhatsApp
 3. **Manual Confirmation**: Admin adds users to workshop WhatsApp groups
 4. **Future Enhancement**: Can be upgraded to automatic payment gateways

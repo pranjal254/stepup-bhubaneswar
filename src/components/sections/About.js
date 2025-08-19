@@ -66,7 +66,7 @@ export default function About() {
 
   const stats = [
     { number: "2024", label: "Founded", icon: <Target className="w-6 h-6" /> },
-    { number: "50+", label: "Workshops", icon: <Music className="w-6 h-6" /> },
+    { number: "10+", label: "Workshops", icon: <Music className="w-6 h-6" /> },
     { number: "25+", label: "Choreographers", icon: <Award className="w-6 h-6" /> },
     { number: "1000+", label: "Happy Dancers", icon: <Sparkles className="w-6 h-6" /> }
   ]

@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Registration {
+  id            Int      @id @default(autoincrement())
+  name          String
+  email         String   @unique
+  phone         String   @unique
+  age           Int
+  experience    Experience @default(BEGINNER)
+  songs         Int
+  price         Int
+  status        Status   @default(PENDING)
+  transactionId String?
+  paymentMethod PaymentMethod?
+  workshop      String   @default("anvi-shetty-sept-2024")
+  notes         String?
+  paidAt        DateTime?
+  registeredAt  DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("registrations")
+}
+
+enum Experience {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum Status {
+  PENDING
+  PAID
+  CANCELLED
+}
+
+enum PaymentMethod {
+  UPI
+  CASH
+  BANK_TRANSFER
+}

@@ -1,497 +1,274 @@
-"use client";
+'use client'
 
-import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { Calendar, MapPin, Users, Clock, Star, ArrowRight } from "lucide-react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
-
+import { useState, useRef } from 'react'
+import Link from 'next/link'
+import { Calendar, MapPin, Users, Clock, Star, ArrowRight, Music, Heart } from 'lucide-react'
+import { motion, useInView } from 'framer-motion'
 
 export default function Workshops() {
-  const [activeFilter, setActiveFilter] = useState("all");
-  const ref = useRef(null);
-  const isInView = useInView(ref, {
-    once: true,
-    amount: 0.1,
-    margin: "0px 0px -100px 0px",
-  });
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, amount: 0.2 })
 
-  const [isMobile, setIsMobile] = useState(false);
+  // Current registrations (this would come from your database)
+  const currentRegistrations = 12 // You'll update this dynamically
 
+  const workshop = {
+    id: 1,
+    title: "Dance Workshop with Anvi Shetty",
+    choreographer: "Anvi Shetty",
+    location: "Mumbai",
+    date: "September 21, 2024",
+    time: "10:00 AM - 6:00 PM",
+    venue: "Bhubaneswar",
+    totalSlots: 50,
+    currentRegistrations: currentRegistrations,
+    description: "An intensive dance workshop covering 3 amazing songs with different styles and techniques.",
+    image: "/api/placeholder/600/400",
+    songs: [
+      {
+        id: 1,
+        name: "Ramta Jogi",
+        style: "Bollywood Madness",
+        duration: "2 hours",
+        description: "High-energy bollywood choreography with modern elements"
+      },
+      {
+        id: 2,
+        name: "Song 2", 
+        style: "Contemporary",
+        duration: "2 hours",
+        description: "Expressive contemporary dance with emotional storytelling"
+      },
+      {
+        id: 3,
+        name: "Song 3",
+        style: "Bollywood",
+        duration: "2 hours", 
+        description: "Classic Bollywood moves with modern twists"
+      }
+    ]
+  }
 
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => {
-      window.removeEventListener("resize", checkMobile);
-    };
-  }, []);
-
-  // Use fallback animation state on mobile
-  const shouldAnimate = isMobile ? true : isInView;
-
-  const workshops = [
+  const getPricing = (songCount) => {
+    const isEarlyBird = currentRegistrations < 30
     
-    {
-      id: 3,
-      title: "Bollywood Masala",
-      choreographer: "Vikas Paudel",
-      location: "Mumbai",
-      date: "August 5-6, 2025",
-      time: "11:00 AM - 5:00 PM",
-      price: "₹799",
-      slotsLeft: 18,
-      totalSlots: 40,
-      level: "Beginner Friendly",
-      category: "bollywood",
-      status: "available",
-      image: "/api/placeholder/400/300",
-      description:
-        "Classic and modern Bollywood choreography with high-energy routines.",
-      color: "from-yellow-500 to-orange-500",
-    },
-   
-    
-  ];
-
-  const categories = [
-    { id: "all", name: "All Workshops", icon: "🎭" },
-    { id: "hip-hop", name: "Hip Hop", icon: "🎤" },
-    { id: "contemporary", name: "Contemporary", icon: "🌊" },
-    { id: "bollywood", name: "Bollywood", icon: "🎬" },
-    { id: "latin", name: "Latin", icon: "💃" },
-  ];
-
-  const filteredWorkshops =
-    activeFilter === "all"
-      ? workshops
-      : workshops.filter((workshop) => workshop.category === activeFilter);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "filling-fast":
-        return "bg-red-50 text-red-600 border-red-200";
-      case "available":
-        return "bg-green-50 text-green-600 border-green-200";
-      default:
-        return "bg-gray-50 text-gray-600 border-gray-200";
+    if (songCount === 1) {
+      return isEarlyBird ? 899 : 999
+    } else if (songCount === 2) {
+      return isEarlyBird ? 1649 : 1799
+    } else if (songCount === 3) {
+      return isEarlyBird ? 2500 : 2599
     }
-  };
+  }
 
-  const getStatusText = (status) => {
-    switch (status) {
-      case "filling-fast":
-        return "Filling Fast";
-      case "available":
-        return "Available";
-      default:
-        return "Available";
+  const getDiscountLabel = () => {
+    const remaining = 30 - currentRegistrations
+    if (remaining > 0) {
+      return `Early Bird Price! Only ${remaining} spots left`
     }
-  };
+    return "Regular Price"
+  }
 
   return (
-    <section
-      id="workshops"
-      className="py-24 bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50 overflow-hidden mobile-visible"
-      ref={ref}
-    >
+    <section id="workshops" className="py-24 bg-gradient-to-br from-orange-50 via-pink-50 to-purple-50" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
+        <motion.div 
           className="text-center space-y-6 mb-16"
           initial={{ opacity: 0, y: 30 }}
-          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8 }}
         >
-          <motion.div
+          <motion.div 
             className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-full px-4 py-2 border border-orange-200"
             whileHover={{ scale: 1.05, y: -2 }}
-            transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <Calendar className="w-4 h-4 text-orange-500" />
-            <span className="text-sm font-medium text-gray-700">
-              Upcoming Workshops
-            </span>
+            <span className="text-sm font-medium text-gray-700">Upcoming Workshop</span>
           </motion.div>
-
-          <motion.h2
-            className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight"
-            initial={{ opacity: 0, y: 30 }}
-            animate={
-              shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }
-            }
-            transition={{ duration: 0.8, delay: 0.3 }}
-          >
-            Learn from{" "}
+          
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
+            Dance with{" "}
             <span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              India's Best
+              Anvi Shetty
             </span>
-          </motion.h2>
-
-          <motion.p
-            className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
-            initial={{ opacity: 0, y: 20 }}
-            animate={
-              shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-            }
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            Curated workshops with top choreographers from across India. Each
-            session is designed to challenge, inspire, and elevate your dance
-            journey.
-          </motion.p>
+          </h2>
+          
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Join Mumbai's renowned choreographer for an intensive workshop covering 3 different dance styles. 
+            Choose your songs and elevate your dance skills!
+          </p>
         </motion.div>
 
-        {/* Filter Tabs */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-3 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+        {/* Workshop Card */}
+        <motion.div 
+          className="max-w-5xl mx-auto"
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {categories.map((category, index) => (
-            <motion.button
-              key={category.id}
-              onClick={() => setActiveFilter(category.id)}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center space-x-2 relative ${
-                activeFilter === category.id
-                  ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg"
-                  : "bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white hover:shadow-md border border-gray-200"
-              }`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={
-                shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-              }
-              transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.span
-                className="text-lg"
-                animate={{
-                  rotate: activeFilter === category.id ? [0, 10, -10, 0] : 0,
-                }}
-                transition={{ duration: 0.5 }}
-              >
-                {category.icon}
-              </motion.span>
-              <span>{category.name}</span>
-
-              {activeFilter === category.id && (
-                <motion.div
-                  layoutId="activeFilter"
-                  className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full -z-10"
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                />
+          <div className="bg-white rounded-3xl overflow-hidden shadow-2xl">
+            {/* Workshop Header */}
+            <div className="relative h-64 bg-gradient-to-r from-orange-500 to-pink-500">
+              <div className="absolute inset-0 bg-black/20"></div>
+              <div className="relative h-full flex items-center justify-center text-center text-white p-8">
+                <div>
+                  <motion.div 
+                    className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4"
+                    whileHover={{ scale: 1.1, rotate: 360 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <span className="text-2xl font-bold">AS</span>
+                  </motion.div>
+                  <h3 className="text-3xl font-bold mb-2">{workshop.title}</h3>
+                  <p className="text-lg opacity-90">with {workshop.choreographer} from {workshop.location}</p>
+                </div>
+              </div>
+              
+              {/* Early Bird Badge */}
+              {currentRegistrations < 30 && (
+                <motion.div 
+                  className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-full"
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <span className="text-sm font-bold">🔥 Early Bird</span>
+                </motion.div>
               )}
-            </motion.button>
-          ))}
-        </motion.div>
+            </div>
 
-        {/* Workshops Grid */}
-        <motion.div
-          className="grid lg:grid-cols-2 gap-8 mb-12"
-          initial={{ opacity: 0 }}
-          animate={shouldAnimate ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-        >
-          <AnimatePresence mode="wait">
-            {filteredWorkshops.map((workshop, index) => (
-              <motion.div
-                key={workshop.id}
-                className="group relative bg-white rounded-3xl overflow-hidden shadow-lg border border-gray-100"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.3 } }}
-                transition={{ delay: index * 0.1, duration: 0.6 }}
-                whileHover={{
-                  y: -10,
-                  scale: 1.02,
-                  rotateY: 2,
-                  transition: {
-                    duration: 0.3,
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 17,
-                  },
-                }}
-                layout
-                layoutId={`workshop-${workshop.id}`}
-                style={{ transformStyle: "preserve-3d" }}
-              >
-                {/* Workshop Image */}
-                <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-                  <motion.div
-                    className={`absolute inset-0 bg-gradient-to-br ${workshop.color} opacity-20`}
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <motion.div
-                        className={`w-16 h-16 bg-gradient-to-r ${workshop.color} rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg`}
-                        whileHover={{
-                          scale: 1.2,
-                          rotate: 360,
-                          transition: { duration: 0.5 },
-                        }}
-                      >
-                        <span className="text-white font-bold text-xl">
-                          {workshop.choreographer
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </span>
-                      </motion.div>
-                      <p className="text-sm text-gray-500 font-medium">
-                        Workshop Preview
-                      </p>
+            <div className="p-8">
+              {/* Workshop Details */}
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold text-gray-900">Workshop Details</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="w-5 h-5 text-orange-500" />
+                      <span className="text-gray-700">{workshop.date}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Clock className="w-5 h-5 text-orange-500" />
+                      <span className="text-gray-700">{workshop.time}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-5 h-5 text-orange-500" />
+                      <span className="text-gray-700">{workshop.venue}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <Users className="w-5 h-5 text-orange-500" />
+                      <span className="text-gray-700">
+                        {workshop.currentRegistrations}/{workshop.totalSlots} registered
+                      </span>
                     </div>
                   </div>
-
-                  {/* Status Badge */}
-                  <motion.div
-                    className="absolute top-4 left-4"
-                    initial={{ opacity: 0, scale: 0 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.3 }}
-                    whileHover={{ scale: 1.1 }}
-                  >
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
-                        workshop.status
-                      )}`}
-                    >
-                      {getStatusText(workshop.status)}
-                    </span>
-                  </motion.div>
-
-                  {/* Slots Badge */}
-                  <motion.div
-                    className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <span className="text-xs font-medium text-gray-700">
-                      {workshop.slotsLeft} slots left
-                    </span>
-                  </motion.div>
-
-                  {/* Hover Overlay */}
-                  <motion.div
-                    className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
-                  >
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.div
-                        className="bg-white/20 backdrop-blur-sm rounded-full p-4"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                      >
-                        <ArrowRight className="text-white" size={24} />
-                      </motion.div>
-                    </div>
-                  </motion.div>
                 </div>
 
-                {/* Workshop Content */}
-                <motion.div
-                  className="p-8 space-y-6"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  {/* Header */}
-                  <div className="space-y-3">
-                    <motion.h3
-                      className="text-2xl font-bold text-gray-900 group-hover:text-orange-500 transition-colors duration-300"
-                      whileHover={{ x: 5 }}
-                    >
-                      {workshop.title}
-                    </motion.h3>
-                    <div className="flex items-center space-x-2 text-gray-600">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span className="font-medium">
-                        with {workshop.choreographer}
-                      </span>
-                      <span className="text-sm">from {workshop.location}</span>
-                    </div>
-                    <motion.p
-                      className="text-gray-600 text-sm leading-relaxed"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      {workshop.description}
-                    </motion.p>
-                  </div>
-
-                  {/* Workshop Details */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { icon: Calendar, text: workshop.date },
-                      { icon: Clock, text: workshop.time },
-                      { icon: MapPin, text: "Bhubaneswar" },
-                      { icon: Users, text: workshop.level },
-                    ].map((detail, idx) => (
-                      <motion.div
-                        key={idx}
-                        className="flex items-center space-x-2 text-sm text-gray-600"
-                        whileHover={{ x: 3, color: "#ea580c" }}
-                        transition={{ duration: 0.2 }}
+                <div className="space-y-4">
+                  <h4 className="text-xl font-bold text-gray-900">What You'll Learn</h4>
+                  <div className="grid gap-3">
+                    {workshop.songs.map((song, index) => (
+                      <motion.div 
+                        key={song.id}
+                        className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                        whileHover={{ scale: 1.02, x: 5 }}
                       >
-                        <detail.icon className="w-4 h-4" />
-                        <span>{detail.text}</span>
+                        <Music className="w-4 h-4 text-pink-500" />
+                        <div>
+                          <span className="font-medium text-gray-900">{song.name}</span>
+                          <span className="text-sm text-gray-600 ml-2">({song.style})</span>
+                        </div>
                       </motion.div>
                     ))}
                   </div>
+                </div>
+              </div>
 
-                  {/* Pricing and Action */}
-                  <motion.div
-                    className="flex items-center justify-between pt-6 border-t border-gray-100"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    <motion.div
-                      className="space-y-1"
-                      whileHover={{ scale: 1.05 }}
+              {/* Pricing Section */}
+              <div className="border-t pt-8">
+                <div className="text-center mb-6">
+                  <h4 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Package</h4>
+                  <p className="text-orange-600 font-medium">{getDiscountLabel()}</p>
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-6">
+                  {[1, 2, 3].map((songCount) => (
+                    <motion.div 
+                      key={songCount}
+                      className={`relative p-6 rounded-2xl border-2 ${
+                        songCount === 3 
+                          ? 'border-orange-500 bg-orange-50' 
+                          : 'border-gray-200 bg-white'
+                      }`}
+                      whileHover={{ scale: 1.05, y: -5 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      <div className="text-2xl font-bold text-gray-900">
-                        {workshop.price}
-                      </div>
-                      <div className="text-sm text-gray-500">per person</div>
-                    </motion.div>
-
-                    <div className="flex flex-col space-y-2">
-                      <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <Link
-                          href={`/register?workshop=${workshop.id}`}
-                          className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center space-x-2"
-                        >
-                          <span>Register Now</span>
-                          <motion.div
-                            whileHover={{ x: 3 }}
-                            transition={{ duration: 0.2 }}
+                      {songCount === 3 && (
+                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                          <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                            Most Popular
+                          </span>
+                        </div>
+                      )}
+                      
+                      <div className="text-center">
+                        <h5 className="text-xl font-bold text-gray-900 mb-2">
+                          {songCount} Song{songCount > 1 ? 's' : ''}
+                        </h5>
+                        <div className="text-3xl font-bold text-orange-500 mb-4">
+                          ₹{getPricing(songCount)}
+                        </div>
+                        <div className="text-sm text-gray-600 mb-6">
+                          {songCount === 1 && "Perfect for beginners"}
+                          {songCount === 2 && "Great combination"}
+                          {songCount === 3 && "Complete experience"}
+                        </div>
+                        
+                        <Link href={`/register?songs=${songCount}`}>
+                          <motion.button 
+                            className={`w-full py-3 rounded-full font-medium transition-all duration-300 ${
+                              songCount === 3
+                                ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
                           >
-                            <ArrowRight size={16} />
-                          </motion.div>
+                            Register Now
+                          </motion.button>
                         </Link>
-                      </motion.div>
-                      <motion.div
-                        className="text-xs text-center text-gray-500"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                      >
-                        {workshop.totalSlots - workshop.slotsLeft}/
-                        {workshop.totalSlots} registered
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                </motion.div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
 
-                {/* Decorative Elements */}
-                <motion.div
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-r from-orange-400 to-pink-400 rounded-full opacity-0 group-hover:opacity-100"
-                  animate={{
-                    rotate: [0, 360],
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
+              {/* Payment Info */}
+              <motion.div 
+                className="mt-8 p-6 bg-blue-50 rounded-2xl border border-blue-200"
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                transition={{ delay: 0.5 }}
+              >
+                <h5 className="font-bold text-gray-900 mb-3">Payment Process</h5>
+                <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-700">
+                  <div className="flex items-start space-x-2">
+                    <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">1</span>
+                    <span>Register and get UPI payment details</span>
+                  </div>
+                  <div className="flex items-start space-x-2">
+                    <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">2</span>
+                    <span>Send payment screenshot to WhatsApp</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-600 mt-3">
+                  After payment confirmation, you'll be added to our workshop group for further details.
+                </p>
               </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-
-        {/* CTA Section */}
-        <motion.div
-          className="text-center bg-white rounded-3xl p-12 shadow-lg border border-gray-100"
-          initial={{ opacity: 0, y: 50 }}
-          animate={shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
-          whileHover={{
-            y: -5,
-            transition: { duration: 0.3 },
-          }}
-        >
-          <div className="space-y-6">
-            <motion.h3
-              className="text-3xl font-bold text-gray-900"
-              initial={{ opacity: 0, y: 20 }}
-              animate={
-                shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-              }
-              transition={{ duration: 0.6, delay: 0.9 }}
-            >
-              Don't see your favorite style?
-            </motion.h3>
-            <motion.p
-              className="text-lg text-gray-600 max-w-2xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={
-                shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-              }
-              transition={{ duration: 0.6, delay: 1.0 }}
-            >
-              We're constantly adding new workshops and bringing diverse
-              choreographers to Bhubaneswar. Let us know what you'd love to
-              learn next!
-            </motion.p>
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={
-                shouldAnimate ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
-              }
-              transition={{ duration: 0.6, delay: 1.1 }}
-            >
-              <motion.button
-                className="bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-3 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  const section = document.getElementById("contact");
-                  if (section) {
-                    section.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-              >
-                Request a Workshop
-              </motion.button>
-
-              <motion.button
-                className="border-2 border-orange-500 text-orange-500 px-6 py-3 rounded-full font-medium hover:bg-orange-500 hover:text-white transition-all duration-300"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  const section = document.getElementById("gallery");
-                  if (section) {
-                    section.scrollIntoView({ behavior: "smooth" });
-                  }
-                }}
-              >
-                View Past Workshops
-              </motion.button>
-            </motion.div>
+            </div>
           </div>
         </motion.div>
       </div>
     </section>
-  );
+  )
 }

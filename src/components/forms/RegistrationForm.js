@@ -151,7 +151,7 @@ export default function RegistrationForm({ workshop }) {
               <div className="bg-white rounded-lg p-4">
                 <p className="font-medium mb-2">Step 1: Pay via UPI</p>
                 <div className="bg-gray-50 rounded p-3 font-mono text-center">
-                  stepupbhubaneswar@paytm
+                  9438363399@ybl
                 </div>
                 <p className="text-xs text-gray-600 mt-2">Amount: {workshopData.price}</p>
               </div>
@@ -160,7 +160,7 @@ export default function RegistrationForm({ workshop }) {
                 <p className="font-medium mb-2">Step 2: Send Screenshot</p>
                 <p>After payment, send the screenshot to our WhatsApp:</p>
                 <div className="bg-green-50 rounded p-3 text-center mt-2">
-                  <span className="font-medium">+91 98765 43210</span>
+                  <span className="font-medium">+91 7749019313</span>
                 </div>
               </div>
               
