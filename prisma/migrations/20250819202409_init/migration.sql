@@ -20,7 +20,7 @@ CREATE TABLE "public"."registrations" (
     "status" "public"."Status" NOT NULL DEFAULT 'PENDING',
     "transactionId" TEXT,
     "paymentMethod" "public"."PaymentMethod",
-    "workshop" TEXT NOT NULL DEFAULT 'anvi-shetty-sept-2024',
+    "workshop" TEXT NOT NULL DEFAULT 'anvi-shetty-sept-2025',
     "notes" TEXT,
     "paidAt" TIMESTAMP(3),
     "registeredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

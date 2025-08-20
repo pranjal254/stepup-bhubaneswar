@@ -23,7 +23,7 @@ model Registration {
   status        Status   @default(PENDING)
   transactionId String?
   paymentMethod PaymentMethod?
-  workshop      String   @default("anvi-shetty-sept-2024")
+  workshop      String   @default("anvi-shetty-sept-2025")
   notes         String?
   paidAt        DateTime?
   registeredAt  DateTime @default(now())

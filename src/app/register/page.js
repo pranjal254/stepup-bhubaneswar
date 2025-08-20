@@ -40,7 +40,7 @@ export default function RegisterPage() {
   const workshop = {
     title: "Dance Workshop with Anvi Shetty",
     choreographer: "Anvi Shetty",
-    date: "September 21, 2024",
+    date: "September 21, 2025",
     time: "12:00 PM - 7:00 PM",
     venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
   };

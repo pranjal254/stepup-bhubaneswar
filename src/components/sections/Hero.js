@@ -21,8 +21,8 @@ export default function Hero() {
     isLoading: true
   })
 
-  // Workshop date - September 21, 2024
-  const workshopDate = new Date('2024-09-21T10:00:00')
+  // Workshop date - September 21, 2025
+  const workshopDate = new Date('2025-09-21T10:00:00')
 
   // Fetch real registration data
   const fetchWorkshopData = async () => {
@@ -390,7 +390,7 @@ export default function Hero() {
                 >
                   <div className="flex items-center space-x-4 text-gray-600">
                     <Calendar className="w-5 h-5 text-orange-500" />
-                    <span>September 21, 2024</span>
+                    <span>September 21, 2025</span>
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <Clock className="w-5 h-5 text-orange-500" />

@@ -101,6 +101,7 @@ export default function MembersPage() {
       const response = await fetch("/api/register");
       if (response.ok) {
         const data = await response.json();
+        console.log(data, 'selected songs?')
         setMembers(data.registrations || []);
         setStats(data.stats || { total: 0, paid: 0, pending: 0, revenue: 0 });
       } else {
@@ -368,7 +369,7 @@ export default function MembersPage() {
               Workshop Members
             </h1>
             <p className="text-gray-600">
-              Anvi Shetty Dance Workshop - September 21, 2024
+              Anvi Shetty Dance Workshop - September 21, 2025
             </p>
           </div>
           <div className="text-right">
