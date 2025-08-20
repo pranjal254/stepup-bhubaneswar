@@ -1,164 +1,212 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { Users, Search, Download, Eye, Phone, Mail, Calendar, Music, Check, X, Clock, Filter, Lock, EyeOff, LogOut, RefreshCw } from 'lucide-react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Link from 'next/link'
+import { useState, useEffect } from "react";
+import {
+  Users,
+  Search,
+  Download,
+  Eye,
+  Phone,
+  Mail,
+  Calendar,
+  Music,
+  Check,
+  X,
+  Clock,
+  Filter,
+  Lock,
+  EyeOff,
+  LogOut,
+  RefreshCw,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 export default function MembersPage() {
   // Authentication state
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isAuthLoading, setIsAuthLoading] = useState(true)
-  const [authForm, setAuthForm] = useState({ username: '', password: '' })
-  const [authError, setAuthError] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
+  const [authForm, setAuthForm] = useState({ username: "", password: "" });
+  const [authError, setAuthError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   // Data state
-  const [members, setMembers] = useState([])
-  const [stats, setStats] = useState({ total: 0, paid: 0, pending: 0, revenue: 0 })
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterStatus, setFilterStatus] = useState('all')
-  const [filterSongs, setFilterSongs] = useState('all')
-  const [selectedMember, setSelectedMember] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [members, setMembers] = useState([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    paid: 0,
+    pending: 0,
+    revenue: 0,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterSongs, setFilterSongs] = useState("all");
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const songNames = {
+    chuttamalle: "Chuttamalle (12PM)",
+    "ramta-jogi": "Ramta Jogi (3PM)",
+    chaudhary: "Chaudhary (5PM)",
+  };
 
   // Check authentication on load
   useEffect(() => {
     const checkAuth = () => {
-      const auth = localStorage.getItem('stepup_admin_auth')
-      if (auth === 'authenticated') {
-        setIsAuthenticated(true)
-        fetchMembers()
+      const auth = localStorage.getItem("stepup_admin_auth");
+      if (auth === "authenticated") {
+        setIsAuthenticated(true);
+        fetchMembers();
       }
-      setIsAuthLoading(false)
-    }
-    checkAuth()
-  }, [])
+      setIsAuthLoading(false);
+    };
+    checkAuth();
+  }, []);
 
   // Authentication handlers
   const handleLogin = (e) => {
-    e.preventDefault()
-    setAuthError('')
+    e.preventDefault();
+    setAuthError("");
 
     // Simple authentication - in production, this should be server-side
-    const ADMIN_USERNAME = 'admin'
-    const ADMIN_PASSWORD = 'stepup2024'
+    const ADMIN_USERNAME = "admin";
+    const ADMIN_PASSWORD = "stepup2024";
 
-    if (authForm.username === ADMIN_USERNAME && authForm.password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true)
-      localStorage.setItem('stepup_admin_auth', 'authenticated')
-      fetchMembers()
+    if (
+      authForm.username === ADMIN_USERNAME &&
+      authForm.password === ADMIN_PASSWORD
+    ) {
+      setIsAuthenticated(true);
+      localStorage.setItem("stepup_admin_auth", "authenticated");
+      fetchMembers();
     } else {
-      setAuthError('Invalid username or password')
-      setAuthForm({ ...authForm, password: '' })
+      setAuthError("Invalid username or password");
+      setAuthForm({ ...authForm, password: "" });
     }
-  }
+  };
 
   const handleLogout = () => {
-    setIsAuthenticated(false)
-    localStorage.removeItem('stepup_admin_auth')
-    setAuthForm({ username: '', password: '' })
-    setMembers([])
-    setStats({ total: 0, paid: 0, pending: 0, revenue: 0 })
-  }
+    setIsAuthenticated(false);
+    localStorage.removeItem("stepup_admin_auth");
+    setAuthForm({ username: "", password: "" });
+    setMembers([]);
+    setStats({ total: 0, paid: 0, pending: 0, revenue: 0 });
+  };
 
   // Data fetching
   const fetchMembers = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const response = await fetch('/api/register')
+      const response = await fetch("/api/register");
       if (response.ok) {
-        const data = await response.json()
-        setMembers(data.registrations || [])
-        setStats(data.stats || { total: 0, paid: 0, pending: 0, revenue: 0 })
+        const data = await response.json();
+        setMembers(data.registrations || []);
+        setStats(data.stats || { total: 0, paid: 0, pending: 0, revenue: 0 });
       } else {
-        console.error('Failed to fetch members')
+        console.error("Failed to fetch members");
       }
     } catch (error) {
-      console.error('Error fetching members:', error)
+      console.error("Error fetching members:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const refreshData = async () => {
-    setIsRefreshing(true)
-    await fetchMembers()
-    setIsRefreshing(false)
-  }
+    setIsRefreshing(true);
+    await fetchMembers();
+    setIsRefreshing(false);
+  };
 
   // Filter members based on search and filters
-  const filteredMembers = members.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         member.phone.includes(searchTerm)
-    
-    const matchesStatus = filterStatus === 'all' || member.status === filterStatus
-    const matchesSongs = filterSongs === 'all' || member.songs.toString() === filterSongs
-    
-    return matchesSearch && matchesStatus && matchesSongs
-  })
+  const filteredMembers = members.filter((member) => {
+    const matchesSearch =
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.phone.includes(searchTerm);
+
+    const matchesStatus =
+      filterStatus === "all" || member.status === filterStatus;
+    const matchesSongs =
+      filterSongs === "all" || member.songs.toString() === filterSongs;
+
+    return matchesSearch && matchesStatus && matchesSongs;
+  });
 
   // Helper functions
   const getStatusColor = (status) => {
     switch (status) {
-      case 'paid':
-        return 'bg-green-100 text-green-800 border-green-200'
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200'
+      case "paid":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "cancelled":
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200'
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
-  }
+  };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'paid':
-        return <Check className="w-4 h-4" />
-      case 'pending':
-        return <Clock className="w-4 h-4" />
-      case 'cancelled':
-        return <X className="w-4 h-4" />
+      case "paid":
+        return <Check className="w-4 h-4" />;
+      case "pending":
+        return <Clock className="w-4 h-4" />;
+      case "cancelled":
+        return <X className="w-4 h-4" />;
       default:
-        return <Clock className="w-4 h-4" />
+        return <Clock className="w-4 h-4" />;
     }
-  }
+  };
 
   // Mark member as paid
   const handleMarkAsPaid = async (memberId) => {
     try {
-      const response = await fetch('/api/register', {
-        method: 'PATCH',
+      const response = await fetch("/api/register", {
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           id: memberId,
-          status: 'paid',
-          transactionId: `TXN${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
-          paymentMethod: 'upi'
-        })
-      })
+          status: "paid",
+          transactionId: `TXN${Date.now()}${Math.random()
+            .toString(36)
+            .substr(2, 5)
+            .toUpperCase()}`,
+          paymentMethod: "upi",
+        }),
+      });
 
       if (response.ok) {
-        await fetchMembers() // Refresh data
+        await fetchMembers(); // Refresh data
       } else {
-        alert('Failed to update payment status')
+        alert("Failed to update payment status");
       }
     } catch (error) {
-      console.error('Failed to update member status:', error)
-      alert('Error updating payment status')
+      console.error("Failed to update member status:", error);
+      alert("Error updating payment status");
     }
-  }
+  };
 
   // Export to CSV
   const exportToCSV = () => {
     const csvContent = [
-      ['Name', 'Email', 'Phone', 'Age', 'Experience', 'Songs', 'Price', 'Status', 'Registered At', 'Transaction ID'],
-      ...filteredMembers.map(member => [
+      [
+        "Name",
+        "Email",
+        "Phone",
+        "Age",
+        "Experience",
+        "Songs",
+        "Price",
+        "Status",
+        "Registered At",
+        "Transaction ID",
+      ],
+      ...filteredMembers.map((member) => [
         member.name,
         member.email,
         member.phone,
@@ -168,18 +216,22 @@ export default function MembersPage() {
         member.price,
         member.status,
         new Date(member.registeredAt).toLocaleString(),
-        member.transactionId || 'N/A'
-      ])
-    ].map(row => row.join(',')).join('\n')
-    
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `anvi-shetty-workshop-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-    window.URL.revokeObjectURL(url)
-  }
+        member.transactionId || "N/A",
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `anvi-shetty-workshop-${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   // Loading screen
   if (isAuthLoading) {
@@ -190,7 +242,7 @@ export default function MembersPage() {
           <p className="text-gray-600 mt-4">Loading...</p>
         </div>
       </div>
-    )
+    );
   }
 
   // Authentication screen
@@ -222,7 +274,9 @@ export default function MembersPage() {
               <input
                 type="text"
                 value={authForm.username}
-                onChange={(e) => setAuthForm({ ...authForm, username: e.target.value })}
+                onChange={(e) =>
+                  setAuthForm({ ...authForm, username: e.target.value })
+                }
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Enter username"
@@ -235,9 +289,11 @@ export default function MembersPage() {
               </label>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={authForm.password}
-                  onChange={(e) => setAuthForm({ ...authForm, password: e.target.value })}
+                  onChange={(e) =>
+                    setAuthForm({ ...authForm, password: e.target.value })
+                  }
                   required
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="Enter password"
@@ -273,16 +329,17 @@ export default function MembersPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              Default: admin / stepup2024
-            </p>
-            <Link href="/" className="text-sm text-orange-600 hover:text-orange-700 mt-2 inline-block">
+            <p className="text-xs text-gray-500">Default: admin / stepup2024</p>
+            <Link
+              href="/"
+              className="text-sm text-orange-600 hover:text-orange-700 mt-2 inline-block"
+            >
               ← Back to Website
             </Link>
           </div>
         </motion.div>
       </div>
-    )
+    );
   }
 
   // Main dashboard
@@ -293,7 +350,10 @@ export default function MembersPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <div className="flex items-center space-x-4 mb-2">
-              <Link href="/" className="text-orange-600 hover:text-orange-700 transition-colors">
+              <Link
+                href="/"
+                className="text-orange-600 hover:text-orange-700 transition-colors"
+              >
                 ← Back to Website
               </Link>
               <button
@@ -304,18 +364,27 @@ export default function MembersPage() {
                 <span>Logout</span>
               </button>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Workshop Members</h1>
-            <p className="text-gray-600">Anvi Shetty Dance Workshop - September 21, 2024</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Workshop Members
+            </h1>
+            <p className="text-gray-600">
+              Anvi Shetty Dance Workshop - September 21, 2024
+            </p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-orange-600">{stats.total}</div>
+            <div className="text-2xl font-bold text-orange-600">
+              {stats.total}
+            </div>
             <div className="text-sm text-gray-600">Total Registrations</div>
             <button
               onClick={refreshData}
               disabled={isRefreshing}
               className="mt-2 flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700 disabled:opacity-50"
             >
-              <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+              <RefreshCw
+                size={14}
+                className={isRefreshing ? "animate-spin" : ""}
+              />
               <span>Refresh</span>
             </button>
           </div>
@@ -323,53 +392,61 @@ export default function MembersPage() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <motion.div 
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
             whileHover={{ scale: 1.02, y: -2 }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Registrations</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
             whileHover={{ scale: 1.02, y: -2 }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Paid Members</p>
-                <p className="text-2xl font-bold text-green-600">{stats.paid}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.paid}
+                </p>
               </div>
               <Check className="w-8 h-8 text-green-500" />
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
             whileHover={{ scale: 1.02, y: -2 }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending Payments</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {stats.pending}
+                </p>
               </div>
               <Clock className="w-8 h-8 text-yellow-500" />
             </div>
           </motion.div>
-          
-          <motion.div 
+
+          <motion.div
             className="bg-white p-6 rounded-xl shadow-sm border border-gray-200"
             whileHover={{ scale: 1.02, y: -2 }}
           >
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-orange-600">₹{stats.revenue.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  ₹{stats.revenue.toLocaleString()}
+                </p>
               </div>
               <Calendar className="w-8 h-8 text-orange-500" />
             </div>
@@ -382,7 +459,10 @@ export default function MembersPage() {
             <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
               {/* Search */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={20}
+                />
                 <input
                   type="text"
                   placeholder="Search members..."
@@ -391,7 +471,7 @@ export default function MembersPage() {
                   className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent w-full sm:w-64"
                 />
               </div>
-              
+
               {/* Status Filter */}
               <select
                 value={filterStatus}
@@ -403,7 +483,7 @@ export default function MembersPage() {
                 <option value="pending">Pending</option>
                 <option value="cancelled">Cancelled</option>
               </select>
-              
+
               {/* Songs Filter */}
               <select
                 value={filterSongs}
@@ -416,7 +496,7 @@ export default function MembersPage() {
                 <option value="3">3 Songs</option>
               </select>
             </div>
-            
+
             {/* Export Button */}
             <motion.button
               onClick={exportToCSV}
@@ -451,15 +531,23 @@ export default function MembersPage() {
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h3 className="font-semibold text-gray-900">{member.name}</h3>
-                      <p className="text-sm text-gray-600">Age: {member.age} • {member.experience}</p>
+                      <h3 className="font-semibold text-gray-900">
+                        {member.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Age: {member.age} • {member.experience}
+                      </p>
                     </div>
-                    <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(member.status)}`}>
+                    <span
+                      className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                        member.status
+                      )}`}
+                    >
                       {getStatusIcon(member.status)}
                       <span className="capitalize">{member.status}</span>
                     </span>
                   </div>
-                  
+
                   <div className="space-y-2 text-sm mb-4">
                     <div className="flex items-center space-x-2">
                       <Mail className="w-4 h-4 text-gray-400" />
@@ -471,10 +559,21 @@ export default function MembersPage() {
                     </div>
                     <div className="flex items-center space-x-2">
                       <Music className="w-4 h-4 text-orange-500" />
-                      <span>{member.songs} Song{member.songs > 1 ? 's' : ''} - ₹{member.price}</span>
+                      <span>
+                        {member.songs} Song{member.songs > 1 ? "s" : ""} - ₹
+                        {member.price}
+                      </span>
                     </div>
+                    {member.selectedSongs && (
+                      <div className="text-xs text-gray-500 ml-6">
+                        Songs:{" "}
+                        {JSON.parse(member.selectedSongs)
+                          .map((songId) => songNames[songId] || songId)
+                          .join(", ")}
+                      </div>
+                    )}
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <span className="text-xs text-gray-500">
                       {new Date(member.registeredAt).toLocaleDateString()}
@@ -486,7 +585,7 @@ export default function MembersPage() {
                       >
                         <Eye size={16} />
                       </button>
-                      {member.status === 'pending' && (
+                      {member.status === "pending" && (
                         <button
                           onClick={() => handleMarkAsPaid(member.id)}
                           className="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-medium hover:bg-green-200 transition-colors"
@@ -506,13 +605,27 @@ export default function MembersPage() {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Member</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contact</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Package</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Price</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Status</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Registered</th>
-                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Actions</th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Member
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Contact
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Package
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Price
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Status
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Registered
+                      </th>
+                      <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -526,42 +639,65 @@ export default function MembersPage() {
                       >
                         <td className="px-6 py-4">
                           <div>
-                            <p className="font-semibold text-gray-900">{member.name}</p>
-                            <p className="text-sm text-gray-600">Age: {member.age} • {member.experience}</p>
+                            <p className="font-semibold text-gray-900">
+                              {member.name}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              Age: {member.age} • {member.experience}
+                            </p>
                           </div>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2 text-sm">
                               <Mail className="w-4 h-4 text-gray-400" />
-                              <span className="text-gray-600 break-all">{member.email}</span>
+                              <span className="text-gray-600 break-all">
+                                {member.email}
+                              </span>
                             </div>
                             <div className="flex items-center space-x-2 text-sm">
                               <Phone className="w-4 h-4 text-gray-400" />
-                              <span className="text-gray-600">{member.phone}</span>
+                              <span className="text-gray-600">
+                                {member.phone}
+                              </span>
                             </div>
                           </div>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-2">
                             <Music className="w-4 h-4 text-orange-500" />
-                            <span className="font-medium">{member.songs} Song{member.songs > 1 ? 's' : ''}</span>
+                            <span className="font-medium">
+                              {member.songs} Song{member.songs > 1 ? "s" : ""}
+                            </span>
                           </div>
+                          {member.selectedSongs && (
+                            <div className="text-xs text-gray-500">
+                              {JSON.parse(member.selectedSongs)
+                                .map((songId) => songNames[songId] || songId)
+                                .join(", ")}
+                            </div>
+                          )}
                         </td>
-                        
+
                         <td className="px-6 py-4">
-                          <span className="font-bold text-gray-900">₹{member.price}</span>
+                          <span className="font-bold text-gray-900">
+                            ₹{member.price}
+                          </span>
                         </td>
-                        
+
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(member.status)}`}>
+                          <span
+                            className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                              member.status
+                            )}`}
+                          >
                             {getStatusIcon(member.status)}
                             <span className="capitalize">{member.status}</span>
                           </span>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <p className="text-sm text-gray-600">
                             {new Date(member.registeredAt).toLocaleDateString()}
@@ -570,7 +706,7 @@ export default function MembersPage() {
                             {new Date(member.registeredAt).toLocaleTimeString()}
                           </p>
                         </td>
-                        
+
                         <td className="px-6 py-4">
                           <div className="flex items-center space-x-2">
                             <button
@@ -580,7 +716,7 @@ export default function MembersPage() {
                             >
                               <Eye size={16} />
                             </button>
-                            {member.status === 'pending' && (
+                            {member.status === "pending" && (
                               <button
                                 onClick={() => handleMarkAsPaid(member.id)}
                                 className="px-3 py-1 bg-green-100 text-green-700 rounded text-xs font-medium hover:bg-green-200 transition-colors"
@@ -595,11 +731,13 @@ export default function MembersPage() {
                   </tbody>
                 </table>
               </div>
-              
+
               {filteredMembers.length === 0 && (
                 <div className="text-center py-12">
                   <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No members found matching your criteria</p>
+                  <p className="text-gray-500">
+                    No members found matching your criteria
+                  </p>
                 </div>
               )}
             </div>
@@ -623,74 +761,129 @@ export default function MembersPage() {
                 exit={{ scale: 0.8, opacity: 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Member Details</h3>
-                
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  Member Details
+                </h3>
+
                 <div className="space-y-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Name</label>
+                    <label className="text-sm font-medium text-gray-600">
+                      Name
+                    </label>
                     <p className="text-gray-900">{selectedMember.name}</p>
                   </div>
-                  
+
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Email</label>
-                    <p className="text-gray-900 break-all">{selectedMember.email}</p>
+                    <label className="text-sm font-medium text-gray-600">
+                      Email
+                    </label>
+                    <p className="text-gray-900 break-all">
+                      {selectedMember.email}
+                    </p>
                   </div>
-                  
+
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Phone</label>
+                    <label className="text-sm font-medium text-gray-600">
+                      Phone
+                    </label>
                     <p className="text-gray-900">{selectedMember.phone}</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Age</label>
+                      <label className="text-sm font-medium text-gray-600">
+                        Age
+                      </label>
                       <p className="text-gray-900">{selectedMember.age}</p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Experience</label>
-                      <p className="text-gray-900 capitalize">{selectedMember.experience}</p>
+                      <label className="text-sm font-medium text-gray-600">
+                        Experience
+                      </label>
+                      <p className="text-gray-900 capitalize">
+                        {selectedMember.experience}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Package</label>
-                      <p className="text-gray-900">{selectedMember.songs} Song{selectedMember.songs > 1 ? 's' : ''}</p>
+                      <label className="text-sm font-medium text-gray-600">
+                        Package
+                      </label>
+                      <p className="text-gray-900">
+                        {selectedMember.songs} Song
+                        {selectedMember.songs > 1 ? "s" : ""}
+                      </p>
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Price</label>
-                      <p className="text-gray-900 font-bold">₹{selectedMember.price}</p>
+                      <label className="text-sm font-medium text-gray-600">
+                        Price
+                      </label>
+                      <p className="text-gray-900 font-bold">
+                        ₹{selectedMember.price}
+                      </p>
                     </div>
                   </div>
-                  
+
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Status</label>
-                    <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(selectedMember.status)} mt-1`}>
+                    <label className="text-sm font-medium text-gray-600">
+                      Status
+                    </label>
+                    <span
+                      className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                        selectedMember.status
+                      )} mt-1`}
+                    >
                       {getStatusIcon(selectedMember.status)}
-                      <span className="capitalize">{selectedMember.status}</span>
+                      <span className="capitalize">
+                        {selectedMember.status}
+                      </span>
                     </span>
                   </div>
-                  
-                  {selectedMember.transactionId && (
+                  {selectedMember.selectedSongs && (
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Transaction ID</label>
-                      <p className="text-gray-900 font-mono text-sm break-all">{selectedMember.transactionId}</p>
+                      <label className="text-sm font-medium text-gray-600">
+                        Selected Songs
+                      </label>
+                      <div className="text-gray-900">
+                        {JSON.parse(selectedMember.selectedSongs)
+                          .map((songId) => songNames[songId] || songId)
+                          .join(", ")}
+                      </div>
                     </div>
                   )}
-                  
+
+                  {selectedMember.transactionId && (
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">
+                        Transaction ID
+                      </label>
+                      <p className="text-gray-900 font-mono text-sm break-all">
+                        {selectedMember.transactionId}
+                      </p>
+                    </div>
+                  )}
+
                   <div>
-                    <label className="text-sm font-medium text-gray-600">Registered At</label>
-                    <p className="text-gray-900">{new Date(selectedMember.registeredAt).toLocaleString()}</p>
+                    <label className="text-sm font-medium text-gray-600">
+                      Registered At
+                    </label>
+                    <p className="text-gray-900">
+                      {new Date(selectedMember.registeredAt).toLocaleString()}
+                    </p>
                   </div>
 
                   {selectedMember.notes && (
                     <div>
-                      <label className="text-sm font-medium text-gray-600">Notes</label>
+                      <label className="text-sm font-medium text-gray-600">
+                        Notes
+                      </label>
                       <p className="text-gray-900">{selectedMember.notes}</p>
                     </div>
                   )}
                 </div>
-                
+
                 <div className="flex justify-end space-x-3 mt-6">
                   <button
                     onClick={() => setSelectedMember(null)}
@@ -698,11 +891,11 @@ export default function MembersPage() {
                   >
                     Close
                   </button>
-                  {selectedMember.status === 'pending' && (
+                  {selectedMember.status === "pending" && (
                     <button
                       onClick={() => {
-                        handleMarkAsPaid(selectedMember.id)
-                        setSelectedMember(null)
+                        handleMarkAsPaid(selectedMember.id);
+                        setSelectedMember(null);
                       }}
                       className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
@@ -716,5 +909,5 @@ export default function MembersPage() {
         </AnimatePresence>
       </div>
     </div>
-  )
+  );
 }

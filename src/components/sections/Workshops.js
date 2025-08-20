@@ -18,8 +18,8 @@ export default function Workshops() {
     choreographer: "Anvi Shetty",
     location: "Mumbai",
     date: "September 21, 2024",
-    time: "10:00 AM - 6:00 PM",
-    venue: "Bhubaneswar",
+    time: "12:00 PM - 7:00 PM",
+    venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
     totalSlots: 50,
     currentRegistrations: currentRegistrations,
     description: "An intensive dance workshop covering 3 amazing songs with different styles and techniques.",
@@ -28,23 +28,23 @@ export default function Workshops() {
       {
         id: 1,
         name: "Ramta Jogi",
-        style: "Bollywood Madness",
+        style: "",
         duration: "2 hours",
-        description: "High-energy bollywood choreography with modern elements"
+        description: ""
       },
       {
         id: 2,
-        name: "Song 2", 
-        style: "Contemporary",
+        name: "Chuttamalle", 
+        style: "",
         duration: "2 hours",
-        description: "Expressive contemporary dance with emotional storytelling"
+        description: ""
       },
       {
         id: 3,
-        name: "Song 3",
-        style: "Bollywood",
+        name: "Chaudhary",
+        style: "",
         duration: "2 hours", 
-        description: "Classic Bollywood moves with modern twists"
+        description: ""
       }
     ]
   }
@@ -57,7 +57,7 @@ export default function Workshops() {
     } else if (songCount === 2) {
       return isEarlyBird ? 1649 : 1799
     } else if (songCount === 3) {
-      return isEarlyBird ? 2500 : 2599
+      return isEarlyBird ? 2449 : 2549
     }
   }
 
@@ -155,12 +155,7 @@ export default function Workshops() {
                       <MapPin className="w-5 h-5 text-orange-500" />
                       <span className="text-gray-700">{workshop.venue}</span>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <Users className="w-5 h-5 text-orange-500" />
-                      <span className="text-gray-700">
-                        {workshop.currentRegistrations}/{workshop.totalSlots} registered
-                      </span>
-                    </div>
+                    
                   </div>
                 </div>
 
@@ -176,7 +171,7 @@ export default function Workshops() {
                         <Music className="w-4 h-4 text-pink-500" />
                         <div>
                           <span className="font-medium text-gray-900">{song.name}</span>
-                          <span className="text-sm text-gray-600 ml-2">({song.style})</span>
+                          
                         </div>
                       </motion.div>
                     ))}
@@ -188,7 +183,7 @@ export default function Workshops() {
               <div className="border-t pt-8">
                 <div className="text-center mb-6">
                   <h4 className="text-2xl font-bold text-gray-900 mb-2">Choose Your Package</h4>
-                  <p className="text-orange-600 font-medium">{getDiscountLabel()}</p>
+                  
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-6">

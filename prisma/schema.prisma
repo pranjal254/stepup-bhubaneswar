@@ -18,6 +18,7 @@ model Registration {
   age           Int
   experience    Experience @default(BEGINNER)
   songs         Int
+  selectedSongs String?  // New field to store selected songs as JSON
   price         Int
   status        Status   @default(PENDING)
   transactionId String?

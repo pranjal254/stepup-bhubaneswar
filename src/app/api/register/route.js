@@ -1,76 +1,79 @@
-import { NextResponse } from 'next/server'
+import { NextResponse } from "next/server";
 
 // Dynamic import to handle build issues
-let prisma = null
+let prisma = null;
 
 async function getPrisma() {
   if (!prisma) {
     try {
-      const { prisma: prismaClient } = await import('@/lib/prisma')
-      prisma = prismaClient
+      const { prisma: prismaClient } = await import("@/lib/prisma");
+      prisma = prismaClient;
     } catch (error) {
-      console.error('Prisma import error:', error)
-      return null
+      console.error("Prisma import error:", error);
+      return null;
     }
   }
-  return prisma
+  return prisma;
 }
 
 export async function POST(request) {
   try {
-    const prismaClient = await getPrisma()
+    const prismaClient = await getPrisma();
     if (!prismaClient) {
       return NextResponse.json(
-        { error: 'Database connection failed' },
+        { error: "Database connection failed" },
         { status: 500 }
-      )
+      );
     }
 
-    const data = await request.json()
-    const { name, email, phone, age, experience, songs } = data
-    
+    const data = await request.json();
+    const { name, email, phone, age, experience, songs, selectedSongs } = data;
+
     // Validate required fields
     if (!name || !email || !phone || !age || !songs) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: "Missing required fields" },
         { status: 400 }
-      )
+      );
+    }
+    if (songs < 3 && (!selectedSongs || selectedSongs.length !== songs)) {
+      return NextResponse.json(
+        { error: "Please select the required number of songs" },
+        { status: 400 }
+      );
     }
 
     // Check if email or phone already exists
     const existingRegistration = await prismaClient.registration.findFirst({
       where: {
-        OR: [
-          { email: email.toLowerCase() },
-          { phone: phone }
-        ]
-      }
-    })
-    
+        OR: [{ email: email.toLowerCase() }, { phone: phone }],
+      },
+    });
+
     if (existingRegistration) {
       return NextResponse.json(
-        { error: 'Email or phone number already registered' },
+        { error: "Email or phone number already registered" },
         { status: 409 }
-      )
+      );
     }
 
     // Get current registration count for pricing
-    const currentRegistrations = await prismaClient.registration.count()
-    const isEarlyBird = currentRegistrations < 30
-    
+    const currentRegistrations = await prismaClient.registration.count();
+    const isEarlyBird = currentRegistrations < 30;
+
     // Calculate pricing
-    let price
+    let price;
     if (songs === 1) {
-      price = isEarlyBird ? 899 : 999
+      price = isEarlyBird ? 899 : 999;
     } else if (songs === 2) {
-      price = isEarlyBird ? 1649 : 1799
+      price = isEarlyBird ? 1649 : 1799;
     } else if (songs === 3) {
-      price = isEarlyBird ? 2500 : 2599
+      price = isEarlyBird ? 2449 : 2549;
     } else {
       return NextResponse.json(
-        { error: 'Invalid song count' },
+        { error: "Invalid song count" },
         { status: 400 }
-      )
+      );
     }
 
     // Create new registration
@@ -82,76 +85,76 @@ export async function POST(request) {
         age: parseInt(age),
         experience: experience.toUpperCase(),
         songs: parseInt(songs),
+        selectedSongs: JSON.stringify(selectedSongs || []),
         price,
-        status: 'PENDING'
-      }
-    })
-    
-    console.log('New registration created:', newRegistration.id)
+        status: "PENDING",
+      },
+    });
+
+    console.log("New registration created:", newRegistration.id);
 
     return NextResponse.json(
-      { 
-        message: 'Registration successful',
+      {
+        message: "Registration successful",
         registration: {
           id: newRegistration.id,
           name: newRegistration.name,
           email: newRegistration.email,
           songs: newRegistration.songs,
           price: newRegistration.price,
-          status: newRegistration.status
-        }
+          status: newRegistration.status,
+        },
       },
       { status: 201 }
-    )
-
+    );
   } catch (error) {
-    console.error('Registration error:', error)
-    
+    console.error("Registration error:", error);
+
     // Handle Prisma specific errors
-    if (error.code === 'P2002') {
+    if (error.code === "P2002") {
       return NextResponse.json(
-        { error: 'Email or phone number already registered' },
+        { error: "Email or phone number already registered" },
         { status: 409 }
-      )
+      );
     }
-    
+
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }
 
 export async function GET(request) {
   try {
-    const prismaClient = await getPrisma()
+    const prismaClient = await getPrisma();
     if (!prismaClient) {
       return NextResponse.json({
         registrations: [],
-        stats: { total: 0, paid: 0, pending: 0, revenue: 0 }
-      })
+        stats: { total: 0, paid: 0, pending: 0, revenue: 0 },
+      });
     }
 
-    const url = new URL(request.url)
-    const status = url.searchParams.get('status')
-    const songs = url.searchParams.get('songs')
-    
+    const url = new URL(request.url);
+    const status = url.searchParams.get("status");
+    const songs = url.searchParams.get("songs");
+
     // Build filter object
-    let where = {}
-    
-    if (status && status !== 'all') {
-      where.status = status.toUpperCase()
+    let where = {};
+
+    if (status && status !== "all") {
+      where.status = status.toUpperCase();
     }
-    
-    if (songs && songs !== 'all') {
-      where.songs = parseInt(songs)
+
+    if (songs && songs !== "all") {
+      where.songs = parseInt(songs);
     }
-    
+
     // Fetch registrations with filters
     const registrations = await prismaClient.registration.findMany({
       where,
       orderBy: {
-        registeredAt: 'desc'
+        registeredAt: "desc",
       },
       select: {
         id: true,
@@ -167,120 +170,135 @@ export async function GET(request) {
         paymentMethod: true,
         paidAt: true,
         registeredAt: true,
-        notes: true
-      }
-    })
-    
+        notes: true,
+      },
+    });
+
     // Calculate stats
-    const [totalCount, paidCount, pendingCount, revenueResult] = await Promise.all([
-      prismaClient.registration.count(),
-      prismaClient.registration.count({ where: { status: 'PAID' } }),
-      prismaClient.registration.count({ where: { status: 'PENDING' } }),
-      prismaClient.registration.aggregate({
-        where: { status: 'PAID' },
-        _sum: { price: true }
-      })
-    ])
-    
+    const [totalCount, paidCount, pendingCount, revenueResult] =
+      await Promise.all([
+        prismaClient.registration.count(),
+        prismaClient.registration.count({ where: { status: "PAID" } }),
+        prismaClient.registration.count({ where: { status: "PENDING" } }),
+        prismaClient.registration.aggregate({
+          where: { status: "PAID" },
+          _sum: { price: true },
+        }),
+      ]);
+
     const stats = {
       total: totalCount,
       paid: paidCount,
       pending: pendingCount,
-      revenue: revenueResult._sum.price || 0
-    }
-    
+      revenue: revenueResult._sum.price || 0,
+    };
+
     // Format registrations for frontend
-    const formattedRegistrations = registrations.map(reg => ({
+    const formattedRegistrations = registrations.map((reg) => ({
       ...reg,
       experience: reg.experience.toLowerCase(),
       status: reg.status.toLowerCase(),
-      paymentMethod: reg.paymentMethod?.toLowerCase() || null
-    }))
-    
+      paymentMethod: reg.paymentMethod?.toLowerCase() || null,
+    }));
+
     return NextResponse.json({
       registrations: formattedRegistrations,
-      stats
-    })
-    
+      stats,
+    });
   } catch (error) {
-    console.error('Error fetching registrations:', error)
+    console.error("Error fetching registrations:", error);
     return NextResponse.json({
       registrations: [],
-      stats: { total: 0, paid: 0, pending: 0, revenue: 0 }
-    })
+      stats: { total: 0, paid: 0, pending: 0, revenue: 0 },
+    });
   }
 }
 
 // ... rest of PATCH and DELETE methods with same error handling pattern
 export async function PATCH(request) {
   try {
-    const prismaClient = await getPrisma()
+    const prismaClient = await getPrisma();
     if (!prismaClient) {
       return NextResponse.json(
-        { error: 'Database connection failed' },
+        { error: "Database connection failed" },
         { status: 500 }
-      )
+      );
     }
 
-    const { id, status, transactionId, paymentMethod = 'UPI', notes } = await request.json()
-    
+    const {
+      id,
+      status,
+      transactionId,
+      paymentMethod = "UPI",
+      notes,
+    } = await request.json();
+
     if (!id || !status) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: "Missing required fields" },
         { status: 400 }
-      )
+      );
     }
-    
+
     // Check if registration exists
     const existingRegistration = await prismaClient.registration.findUnique({
-      where: { id: parseInt(id) }
-    })
-    
+      where: { id: parseInt(id) },
+    });
+
     if (!existingRegistration) {
       return NextResponse.json(
-        { error: 'Registration not found' },
+        { error: "Registration not found" },
         { status: 404 }
-      )
+      );
     }
-    
+
     // Prepare update data
     const updateData = {
       status: status.toUpperCase(),
-      transactionId: transactionId || `TXN${Date.now()}${Math.random().toString(36).substr(2, 5).toUpperCase()}`,
+      transactionId:
+        transactionId ||
+        `TXN${Date.now()}${Math.random()
+          .toString(36)
+          .substr(2, 5)
+          .toUpperCase()}`,
       paymentMethod: paymentMethod.toUpperCase(),
-      paidAt: status.toLowerCase() === 'paid' ? new Date() : null
-    }
-    
+      paidAt: status.toLowerCase() === "paid" ? new Date() : null,
+    };
+
     if (notes !== undefined) {
-      updateData.notes = notes
+      updateData.notes = notes;
     }
-    
+
     // Update registration
     const updatedRegistration = await prismaClient.registration.update({
       where: { id: parseInt(id) },
-      data: updateData
-    })
-    
-    console.log('Registration updated:', updatedRegistration.id, 'Status:', updatedRegistration.status)
-    
+      data: updateData,
+    });
+
+    console.log(
+      "Registration updated:",
+      updatedRegistration.id,
+      "Status:",
+      updatedRegistration.status
+    );
+
     // Format response
     const formattedRegistration = {
       ...updatedRegistration,
       experience: updatedRegistration.experience.toLowerCase(),
       status: updatedRegistration.status.toLowerCase(),
-      paymentMethod: updatedRegistration.paymentMethod?.toLowerCase() || null
-    }
-    
+      paymentMethod: updatedRegistration.paymentMethod?.toLowerCase() || null,
+    };
+
     return NextResponse.json({
-      message: 'Registration updated successfully',
-      registration: formattedRegistration
-    })
-    
+      message: "Registration updated successfully",
+      registration: formattedRegistration,
+    });
   } catch (error) {
-    console.error('Error updating registration:', error)
+    console.error("Error updating registration:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
-    )
+    );
   }
 }

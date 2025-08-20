@@ -33,6 +33,7 @@ export default function RegisterPage() {
     age: "",
     experience: "beginner",
     songs: parseInt(searchParams.get("songs")) || 1,
+    selectedSongs: [], // New field
   });
 
   // Workshop details
@@ -40,8 +41,8 @@ export default function RegisterPage() {
     title: "Dance Workshop with Anvi Shetty",
     choreographer: "Anvi Shetty",
     date: "September 21, 2024",
-    time: "10:00 AM - 6:00 PM",
-    venue: "Bhubaneswar, Odisha",
+    time: "12:00 PM - 7:00 PM",
+    venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
   };
 
   // Contact details
@@ -50,6 +51,22 @@ export default function RegisterPage() {
     whatsapp: "+917749019313",
     whatsappUrl: "https://wa.me/917749019313",
   };
+
+  const songOptions = [
+    {
+      id: "chuttamalle",
+      name: "Chuttamalle",
+      time: "12:00 PM",
+      style: "Hip Hop Fusion",
+    },
+    {
+      id: "ramta-jogi",
+      name: "Ramta Jogi",
+      time: "3:00 PM",
+      style: "Contemporary",
+    },
+    { id: "chaudhary", name: "Chaudhary", time: "5:00 PM", style: "Bollywood" },
+  ];
 
   // Get current pricing (this would come from API in real implementation)
   const [currentRegistrations, setCurrentRegistrations] = useState(12);
@@ -62,7 +79,7 @@ export default function RegisterPage() {
     } else if (songCount === 2) {
       return isEarlyBird ? 1649 : 1799;
     } else if (songCount === 3) {
-      return isEarlyBird ? 2500 : 2599;
+      return isEarlyBird ? 2449 : 2549;
     }
   };
 
@@ -72,6 +89,24 @@ export default function RegisterPage() {
       [e.target.name]: e.target.value,
     });
     setError(""); // Clear error when user starts typing
+  };
+
+  const handleSongSelection = (songId) => {
+    const maxSongs = formData.songs;
+    let newSelection = [...formData.selectedSongs];
+
+    if (newSelection.includes(songId)) {
+      newSelection = newSelection.filter((id) => id !== songId);
+    } else {
+      if (newSelection.length < maxSongs) {
+        newSelection.push(songId);
+      }
+    }
+
+    setFormData({
+      ...formData,
+      selectedSongs: newSelection,
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -114,13 +149,22 @@ export default function RegisterPage() {
       return;
     }
 
+    if (formData.songs < 3 && formData.selectedSongs.length !== formData.songs) {
+    setError(`Please select exactly ${formData.songs} song${formData.songs > 1 ? 's' : ''}`)
+    setIsLoading(false)
+    return
+  }
+
     try {
       const response = await fetch("/api/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+        ...formData,
+        selectedSongs: formData.songs === 3 ? songOptions.map(s => s.id) : formData.selectedSongs
+      })
       });
 
       const data = await response.json();
@@ -183,7 +227,6 @@ export default function RegisterPage() {
           </div>
         </motion.div>
 
-      
         <motion.div
           className="flex flex-col items-center mb-12"
           initial={{ opacity: 0 }}
@@ -284,7 +327,13 @@ export default function RegisterPage() {
                             name="songs"
                             value={songCount}
                             checked={formData.songs === songCount}
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              setFormData({
+                                ...formData,
+                                songs: parseInt(e.target.value),
+                                selectedSongs: [], // Reset selection when package changes
+                              });
+                            }}
                             className="text-orange-500 focus:ring-orange-500"
                           />
                           <div>
@@ -294,9 +343,9 @@ export default function RegisterPage() {
                             <div className="flex items-center space-x-1 text-xs text-gray-500">
                               <Music className="w-3 h-3" />
                               <span>
-                                {songCount === 1 && "Hip Hop"}
-                                {songCount === 2 && "Hip Hop + Contemporary"}
-                                {songCount === 3 && "All 3 Styles"}
+                                {songCount === 1 && "Choose any one"}
+                                {songCount === 2 && "Choose any two"}
+                                {songCount === 3 && "All 3 Songs"}
                               </span>
                             </div>
                           </div>
@@ -314,6 +363,63 @@ export default function RegisterPage() {
                       </motion.label>
                     ))}
                   </div>
+
+                  {/* Song Selection - Show when 1 or 2 songs selected */}
+                  {formData.songs < 3 && (
+                    <div className="mt-4 pt-4 border-t">
+                      <h6 className="font-medium text-gray-900 mb-2">
+                        Select {formData.songs} Song
+                        {formData.songs > 1 ? "s" : ""}:
+                      </h6>
+                      <div className="space-y-2">
+                        {songOptions.map((song) => (
+                          <label
+                            key={song.id}
+                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer text-sm transition-all ${
+                              formData.selectedSongs.includes(song.id)
+                                ? "bg-orange-100 border border-orange-300"
+                                : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
+                            } ${
+                              !formData.selectedSongs.includes(song.id) &&
+                              formData.selectedSongs.length >= formData.songs
+                                ? "opacity-50 cursor-not-allowed"
+                                : ""
+                            }`}
+                          >
+                            <div className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                checked={formData.selectedSongs.includes(
+                                  song.id
+                                )}
+                                onChange={() => handleSongSelection(song.id)}
+                                disabled={
+                                  !formData.selectedSongs.includes(song.id) &&
+                                  formData.selectedSongs.length >=
+                                    formData.songs
+                                }
+                                className="text-orange-500 focus:ring-orange-500"
+                              />
+                              <div>
+                                <div className="font-medium text-gray-900">
+                                  {song.name}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                  {song.time} • {song.style}
+                                </div>
+                              </div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                      {formData.selectedSongs.length > 0 && (
+                        <div className="mt-2 text-xs text-green-600">
+                          {formData.selectedSongs.length} of {formData.songs}{" "}
+                          selected
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Pricing Summary */}
@@ -628,10 +734,7 @@ export default function RegisterPage() {
                           <li>
                             • Workshop venue details will be shared in the group
                           </li>
-                          <li>
-                            • Refunds available up to 48 hours before the
-                            workshop
-                          </li>
+
                           <li>
                             • Bring comfortable clothes, water bottle, and towel
                           </li>

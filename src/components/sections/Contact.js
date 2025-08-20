@@ -75,12 +75,7 @@ export default function Contact() {
         "Click 'Register Now' on any workshop, pay via UPI, and send the payment screenshot to our WhatsApp. We'll add you to the workshop group immediately.",
       icon: "📝",
     },
-    {
-      question: "What's your refund policy?",
-      answer:
-        "Full refunds are available up to 48 hours before the workshop. For cancellations within 48 hours, we offer credits for future workshops.",
-      icon: "💰",
-    },
+    
     {
       question: "Do you provide certificates?",
       answer:
