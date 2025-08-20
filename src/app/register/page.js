@@ -405,7 +405,7 @@ export default function RegisterPage() {
                                   {song.name}
                                 </div>
                                 <div className="text-xs text-gray-500">
-                                  {song.time} • {song.style}
+                                  {song.time} 
                                 </div>
                               </div>
                             </div>
@@ -430,12 +430,7 @@ export default function RegisterPage() {
                       ₹{getPricing(formData.songs)}
                     </span>
                   </div>
-                  {currentRegistrations < 30 && (
-                    <p className="text-sm text-green-600 font-medium">
-                      🎉 Early Bird Pricing! Only {30 - currentRegistrations}{" "}
-                      spots left
-                    </p>
-                  )}
+                  
                 </div>
               </div>
             </div>

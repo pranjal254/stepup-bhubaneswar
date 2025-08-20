@@ -45,11 +45,52 @@ export default function MembersPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Song mapping with complete details
+  const songOptions = [
+    { id: 'chuttamalle', name: 'Chuttamalle', time: '12:00 PM', style: 'Hip Hop Fusion' },
+    { id: 'ramta-jogi', name: 'Ramta Jogi', time: '3:00 PM', style: 'Contemporary' },
+    { id: 'chaudhary', name: 'Chaudhary', time: '5:00 PM', style: 'Bollywood' }
+  ];
+
   const songNames = {
     chuttamalle: "Chuttamalle (12PM)",
     "ramta-jogi": "Ramta Jogi (3PM)",
     chaudhary: "Chaudhary (5PM)",
   };
+
+  // Helper function to get selected songs display
+  // Updated function to handle the selectedSongs properly
+const getSelectedSongsDisplay = (selectedSongs, songCount) => {
+  // Handle case where all 3 songs are selected
+  if (songCount === 3) {
+    return "All 3 Songs (Chuttamalle, Ramta Jogi, Chaudhary)";
+  }
+
+  // Handle case where selectedSongs is null or undefined
+  if (!selectedSongs) {
+    return "Not specified";
+  }
+
+  try {
+    // Parse the JSON string from database
+    let parsed;
+    if (typeof selectedSongs === 'string') {
+      parsed = JSON.parse(selectedSongs);
+    } else {
+      parsed = selectedSongs;
+    }
+
+    // Check if it's a valid array with items
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      return parsed.map(songId => songNames[songId] || songId).join(", ");
+    }
+    
+    return "Not specified";
+  } catch (error) {
+    console.error('Error parsing selectedSongs:', error, selectedSongs);
+    return "Error parsing songs";
+  }
+};
 
   // Check authentication on load
   useEffect(() => {
@@ -69,7 +110,6 @@ export default function MembersPage() {
     e.preventDefault();
     setAuthError("");
 
-    // Simple authentication - in production, this should be server-side
     const ADMIN_USERNAME = "admin";
     const ADMIN_PASSWORD = "stepup2024";
 
@@ -101,7 +141,7 @@ export default function MembersPage() {
       const response = await fetch("/api/register");
       if (response.ok) {
         const data = await response.json();
-        console.log(data, 'selected songs?')
+        console.log('Members data:', data);
         setMembers(data.registrations || []);
         setStats(data.stats || { total: 0, paid: 0, pending: 0, revenue: 0 });
       } else {
@@ -182,7 +222,7 @@ export default function MembersPage() {
       });
 
       if (response.ok) {
-        await fetchMembers(); // Refresh data
+        await fetchMembers();
       } else {
         alert("Failed to update payment status");
       }
@@ -202,6 +242,7 @@ export default function MembersPage() {
         "Age",
         "Experience",
         "Songs",
+        "Selected Songs",
         "Price",
         "Status",
         "Registered At",
@@ -214,6 +255,7 @@ export default function MembersPage() {
         member.age,
         member.experience,
         member.songs,
+        getSelectedSongsDisplay(member.selectedSongs, member.songs),
         member.price,
         member.status,
         new Date(member.registeredAt).toLocaleString(),
@@ -369,7 +411,7 @@ export default function MembersPage() {
               Workshop Members
             </h1>
             <p className="text-gray-600">
-              Anvi Shetty Dance Workshop - September 21, 2025
+              Anvi Shetty Dance Workshop - September 21, 2024
             </p>
           </div>
           <div className="text-right">
@@ -558,21 +600,17 @@ export default function MembersPage() {
                       <Phone className="w-4 h-4 text-gray-400" />
                       <span>{member.phone}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Music className="w-4 h-4 text-orange-500" />
-                      <span>
-                        {member.songs} Song{member.songs > 1 ? "s" : ""} - ₹
-                        {member.price}
-                      </span>
-                    </div>
-                    {member.selectedSongs && (
-                      <div className="text-xs text-gray-500 ml-6">
-                        Songs:{" "}
-                        {JSON.parse(member.selectedSongs)
-                          .map((songId) => songNames[songId] || songId)
-                          .join(", ")}
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2">
+                        <Music className="w-4 h-4 text-orange-500" />
+                        <span>
+                          {member.songs} Song{member.songs > 1 ? "s" : ""} - ₹{member.price}
+                        </span>
                       </div>
-                    )}
+                      <div className="text-xs text-gray-500 ml-6 bg-gray-50 p-2 rounded">
+                        <strong>Songs:</strong> {getSelectedSongsDisplay(member.selectedSongs, member.songs)}
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -613,7 +651,7 @@ export default function MembersPage() {
                         Contact
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                        Package
+                        Package & Songs
                       </th>
                       <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
                         Price
@@ -667,19 +705,18 @@ export default function MembersPage() {
                         </td>
 
                         <td className="px-6 py-4">
-                          <div className="flex items-center space-x-2">
-                            <Music className="w-4 h-4 text-orange-500" />
-                            <span className="font-medium">
-                              {member.songs} Song{member.songs > 1 ? "s" : ""}
-                            </span>
-                          </div>
-                          {member.selectedSongs && (
-                            <div className="text-xs text-gray-500">
-                              {JSON.parse(member.selectedSongs)
-                                .map((songId) => songNames[songId] || songId)
-                                .join(", ")}
+                          <div className="space-y-2">
+                            <div className="flex items-center space-x-2">
+                              <Music className="w-4 h-4 text-orange-500" />
+                              <span className="font-medium">
+                                {member.songs} Song{member.songs > 1 ? "s" : ""}
+                              </span>
                             </div>
-                          )}
+                            <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-w-xs">
+                              <strong>Selected:</strong><br />
+                              {getSelectedSongsDisplay(member.selectedSongs, member.songs)}
+                            </div>
+                          </div>
                         </td>
 
                         <td className="px-6 py-4">
@@ -829,6 +866,17 @@ export default function MembersPage() {
 
                   <div>
                     <label className="text-sm font-medium text-gray-600">
+                      Selected Songs
+                    </label>
+                    <div className="bg-gray-50 p-3 rounded-lg mt-1">
+                      <p className="text-gray-900 text-sm">
+                        {getSelectedSongsDisplay(selectedMember.selectedSongs, selectedMember.songs)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">
                       Status
                     </label>
                     <span
@@ -842,18 +890,6 @@ export default function MembersPage() {
                       </span>
                     </span>
                   </div>
-                  {selectedMember.selectedSongs && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-600">
-                        Selected Songs
-                      </label>
-                      <div className="text-gray-900">
-                        {JSON.parse(selectedMember.selectedSongs)
-                          .map((songId) => songNames[songId] || songId)
-                          .join(", ")}
-                      </div>
-                    </div>
-                  )}
 
                   {selectedMember.transactionId && (
                     <div>

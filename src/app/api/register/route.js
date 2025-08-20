@@ -139,7 +139,6 @@ export async function GET(request) {
     const status = url.searchParams.get("status");
     const songs = url.searchParams.get("songs");
 
-    // Build filter object
     let where = {};
 
     if (status && status !== "all") {
@@ -164,6 +163,7 @@ export async function GET(request) {
         age: true,
         experience: true,
         songs: true,
+        selectedSongs: true, // Make sure this is included
         price: true,
         status: true,
         transactionId: true,
@@ -193,12 +193,13 @@ export async function GET(request) {
       revenue: revenueResult._sum.price || 0,
     };
 
-    // Format registrations for frontend
+    // Format registrations for frontend - KEEP selectedSongs as is
     const formattedRegistrations = registrations.map((reg) => ({
       ...reg,
       experience: reg.experience.toLowerCase(),
       status: reg.status.toLowerCase(),
       paymentMethod: reg.paymentMethod?.toLowerCase() || null,
+      // Don't modify selectedSongs here - keep it as stored in DB
     }));
 
     return NextResponse.json({
