@@ -69,17 +69,17 @@ export default function RegisterPage() {
   ];
 
   // Get current pricing (this would come from API in real implementation)
-  const [currentRegistrations, setCurrentRegistrations] = useState(12);
+  const [currentRegistrations, setCurrentRegistrations] = useState(31);
 
   const getPricing = (songCount) => {
     const isEarlyBird = currentRegistrations < 30;
 
     if (songCount === 1) {
-      return isEarlyBird ? 899 : 999;
+      return isEarlyBird ? 899 : 949;
     } else if (songCount === 2) {
-      return isEarlyBird ? 1649 : 1799;
+      return isEarlyBird ? 1649 : 1749;
     } else if (songCount === 3) {
-      return isEarlyBird ? 2449 : 2549;
+      return isEarlyBird ? 2449 : 2449;
     }
   };
 

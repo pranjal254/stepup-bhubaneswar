@@ -10,7 +10,7 @@ export default function Workshops() {
   const isInView = useInView(ref, { once: true, amount: 0.2 })
 
   // Current registrations (this would come from your database)
-  const currentRegistrations = 12 // You'll update this dynamically
+  const currentRegistrations = 31 // You'll update this dynamically
 
   const workshop = {
     id: 1,
@@ -53,11 +53,11 @@ export default function Workshops() {
     const isEarlyBird = currentRegistrations < 30
     
     if (songCount === 1) {
-      return isEarlyBird ? 899 : 999
+      return isEarlyBird ? 899 : 949
     } else if (songCount === 2) {
-      return isEarlyBird ? 1649 : 1799
+      return isEarlyBird ? 1649 : 1749
     } else if (songCount === 3) {
-      return isEarlyBird ? 2449 : 2549
+      return isEarlyBird ? 2449 : 2449
     }
   }
 

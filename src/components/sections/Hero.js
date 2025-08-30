@@ -89,7 +89,7 @@ export default function Hero() {
   // Calculate pricing and availability
   const isEarlyBird = workshopData.totalRegistrations < 30
   const spotsLeft = workshopData.totalSlots - workshopData.totalRegistrations
-  const startingPrice = isEarlyBird ? 899 : 999
+  const startingPrice = isEarlyBird ? 899 : 459
   const isWorkshopFull = spotsLeft <= 0
   const isAlmostFull = spotsLeft <= 5 && spotsLeft > 0
 
