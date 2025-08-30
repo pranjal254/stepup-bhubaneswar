@@ -75,11 +75,11 @@ export default function RegisterPage() {
     const isEarlyBird = currentRegistrations < 30;
 
     if (songCount === 1) {
-      return isEarlyBird ? 899 : 999;
+      return isEarlyBird ? 899 : 949;
     } else if (songCount === 2) {
-      return isEarlyBird ? 1649 : 1799;
+      return isEarlyBird ? 1649 : 1749;
     } else if (songCount === 3) {
-      return isEarlyBird ? 2449 : 2549;
+      return isEarlyBird ? 2449 : 2449;
     }
   };
 
