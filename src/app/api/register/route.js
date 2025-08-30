@@ -64,11 +64,11 @@ export async function POST(request) {
     // Calculate pricing
     let price;
     if (songs === 1) {
-      price = isEarlyBird ? 899 : 999;
+      price = isEarlyBird ? 899 : 949;
     } else if (songs === 2) {
-      price = isEarlyBird ? 1649 : 1799;
+      price = isEarlyBird ? 1649 : 1749;
     } else if (songs === 3) {
-      price = isEarlyBird ? 2449 : 2549;
+      price = isEarlyBird ? 2449 : 2449;
     } else {
       return NextResponse.json(
         { error: "Invalid song count" },
