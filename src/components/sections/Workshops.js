@@ -18,7 +18,7 @@ export default function Workshops() {
     choreographer: "Anvi Shetty",
     location: "Mumbai",
     date: "September 21, 2025",
-    time: "12:00 PM - 7:00 PM",
+    time: "2:00 PM - 9:00 PM",
     venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
     totalSlots: 50,
     currentRegistrations: currentRegistrations,
