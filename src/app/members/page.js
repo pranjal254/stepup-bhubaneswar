@@ -372,7 +372,7 @@ const getSelectedSongsDisplay = (selectedSongs, songCount) => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">Default: admin / stepup2024</p>
+     
             <Link
               href="/"
               className="text-sm text-orange-600 hover:text-orange-700 mt-2 inline-block"
