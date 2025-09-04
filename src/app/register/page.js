@@ -41,7 +41,7 @@ export default function RegisterPage() {
     title: "Dance Workshop with Anvi Shetty",
     choreographer: "Anvi Shetty",
     date: "September 21, 2025",
-    time: "12:00 PM - 7:00 PM",
+    time: "2:00 PM - 9:00 PM",
     venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
   };
 
@@ -56,16 +56,16 @@ export default function RegisterPage() {
     {
       id: "chuttamalle",
       name: "Chuttamalle",
-      time: "12:00 PM",
+      time: "2:00 PM",
       style: "Hip Hop Fusion",
     },
     {
       id: "ramta-jogi",
       name: "Ramta Jogi",
-      time: "3:00 PM",
+      time: "4:00 PM",
       style: "Contemporary",
     },
-    { id: "chaudhary", name: "Chaudhary", time: "5:00 PM", style: "Bollywood" },
+    { id: "chaudhary", name: "Chaudhary", time: "7:00 PM", style: "Bollywood" },
   ];
 
   // Get current pricing (this would come from API in real implementation)
