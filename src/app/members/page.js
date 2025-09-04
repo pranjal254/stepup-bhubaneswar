@@ -47,15 +47,15 @@ export default function MembersPage() {
 
   // Song mapping with complete details
   const songOptions = [
-    { id: 'chuttamalle', name: 'Chuttamalle', time: '12:00 PM', style: 'Hip Hop Fusion' },
-    { id: 'ramta-jogi', name: 'Ramta Jogi', time: '3:00 PM', style: 'Contemporary' },
-    { id: 'chaudhary', name: 'Chaudhary', time: '5:00 PM', style: 'Bollywood' }
+    { id: 'chuttamalle', name: 'Chuttamalle', time: '2:00 PM', style: 'Hip Hop Fusion' },
+    { id: 'ramta-jogi', name: 'Ramta Jogi', time: '4:00 PM', style: 'Contemporary' },
+    { id: 'chaudhary', name: 'Chaudhary', time: '7:00 PM', style: 'Bollywood' }
   ];
 
   const songNames = {
-    chuttamalle: "Chuttamalle (12PM)",
-    "ramta-jogi": "Ramta Jogi (3PM)",
-    chaudhary: "Chaudhary (5PM)",
+    chuttamalle: "Chuttamalle (2PM)",
+    "ramta-jogi": "Ramta Jogi (4PM)",
+    chaudhary: "Chaudhary (7PM)",
   };
 
   // Helper function to get selected songs display
