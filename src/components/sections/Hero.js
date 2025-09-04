@@ -394,7 +394,7 @@ export default function Hero() {
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <Clock className="w-5 h-5 text-orange-500" />
-                    <span>12:00 PM - 7:00 PM</span>
+                    <span>2:00 PM - 9:00 PM</span>
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <MapPin className="w-5 h-5 text-orange-500" />
