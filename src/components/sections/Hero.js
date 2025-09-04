@@ -16,7 +16,7 @@ export default function Hero() {
   // Real data from API
   const [workshopData, setWorkshopData] = useState({
     totalRegistrations: 0,
-    totalSlots: 50,
+    totalSlots: 500,
     revenue: 0,
     isLoading: true
   })
@@ -32,7 +32,7 @@ export default function Hero() {
         const data = await response.json()
         setWorkshopData({
           totalRegistrations: data.stats?.total || 0,
-          totalSlots: 50,
+          totalSlots: 500,
           revenue: data.stats?.revenue || 0,
           isLoading: false
         })
@@ -40,7 +40,7 @@ export default function Hero() {
         // Fallback data if API fails
         setWorkshopData({
           totalRegistrations: 0,
-          totalSlots: 50,
+          totalSlots: 500,
           revenue: 0,
           isLoading: false
         })
@@ -49,7 +49,7 @@ export default function Hero() {
       console.error('Failed to fetch workshop data:', error)
       setWorkshopData({
         totalRegistrations: 0,
-        totalSlots: 50,
+        totalSlots: 500,
         revenue: 0,
         isLoading: false
       })
@@ -464,11 +464,11 @@ export default function Hero() {
                         ✨ Early bird pricing for first 30 registrations
                       </div>
                     )}
-                    {workshopData.revenue > 0 && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        ₹{workshopData.revenue.toLocaleString()} collected so far
-                      </div>
-                    )}
+                    // {workshopData.revenue > 0 && (
+                    //   <div className="text-xs text-gray-500 mt-1">
+                    //     ₹{workshopData.revenue.toLocaleString()} collected so far
+                    //   </div>
+                    // )}
                   </div>
                   
                   <motion.div
