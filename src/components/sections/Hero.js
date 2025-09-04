@@ -464,11 +464,6 @@ export default function Hero() {
                         ✨ Early bird pricing for first 30 registrations
                       </div>
                     )}
-                    // {workshopData.revenue > 0 && (
-                    //   <div className="text-xs text-gray-500 mt-1">
-                    //     ₹{workshopData.revenue.toLocaleString()} collected so far
-                    //   </div>
-                    // )}
                   </div>
                   
                   <motion.div
