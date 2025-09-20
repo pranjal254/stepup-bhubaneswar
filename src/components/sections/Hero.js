@@ -89,7 +89,7 @@ export default function Hero() {
   // Calculate pricing and availability
   const isEarlyBird = workshopData.totalRegistrations < 30
   const spotsLeft = workshopData.totalSlots - workshopData.totalRegistrations
-  const startingPrice = isEarlyBird ? 899 : 949
+  const startingPrice = isEarlyBird ? 899 : 1199
   const isWorkshopFull = spotsLeft <= 0
   const isAlmostFull = spotsLeft <= 5 && spotsLeft > 0
 
@@ -457,7 +457,7 @@ export default function Hero() {
                   transition={{ duration: 0.6, delay: 1.4 }}
                 >
                   <div className="mb-4">
-                    <div className="text-3xl font-bold text-gray-900">₹{startingPrice} - ₹2599</div>
+                    <div className="text-3xl font-bold text-gray-900">₹{startingPrice} - ₹3597</div>
                     <div className="text-sm text-gray-500">Choose 1, 2, or 3 songs</div>
                     {isEarlyBird && !isWorkshopFull && (
                       <div className="text-sm text-green-600 font-medium mt-1">
