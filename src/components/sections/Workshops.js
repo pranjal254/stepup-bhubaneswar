@@ -53,11 +53,11 @@ export default function Workshops() {
     const isEarlyBird = currentRegistrations < 30
     
     if (songCount === 1) {
-      return isEarlyBird ? 899 : 949
+      return isEarlyBird ? 899 : 1199
     } else if (songCount === 2) {
-      return isEarlyBird ? 1649 : 1749
+      return isEarlyBird ? 1649 : 2398
     } else if (songCount === 3) {
-      return isEarlyBird ? 2449 : 2449
+      return isEarlyBird ? 2449 : 3597
     }
   }
 
