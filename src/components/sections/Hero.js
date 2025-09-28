@@ -32,7 +32,7 @@ export default function Hero() {
         const data = await response.json()
         setWorkshopData({
           totalRegistrations: data.stats?.total || 0,
-          totalSlots: 50,
+          totalSlots: 500,
           revenue: data.stats?.revenue || 0,
           isLoading: false
         })
@@ -40,7 +40,7 @@ export default function Hero() {
         // Fallback data if API fails
         setWorkshopData({
           totalRegistrations: 0,
-          totalSlots: 50,
+          totalSlots: 500,
           revenue: 0,
           isLoading: false
         })
@@ -49,7 +49,7 @@ export default function Hero() {
       console.error('Failed to fetch workshop data:', error)
       setWorkshopData({
         totalRegistrations: 0,
-        totalSlots: 50,
+        totalSlots: 500,
         revenue: 0,
         isLoading: false
       })
@@ -89,7 +89,7 @@ export default function Hero() {
   // Calculate pricing and availability
   const isEarlyBird = workshopData.totalRegistrations < 30
   const spotsLeft = workshopData.totalSlots - workshopData.totalRegistrations
-  const startingPrice = isEarlyBird ? 899 : 459
+  const startingPrice = isEarlyBird ? 899 : 1199
   const isWorkshopFull = spotsLeft <= 0
   const isAlmostFull = spotsLeft <= 5 && spotsLeft > 0
 
@@ -394,7 +394,7 @@ export default function Hero() {
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <Clock className="w-5 h-5 text-orange-500" />
-                    <span>12:00 PM - 7:00 PM</span>
+                    <span>2:00 PM - 9:00 PM</span>
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <MapPin className="w-5 h-5 text-orange-500" />
@@ -457,18 +457,13 @@ export default function Hero() {
                   transition={{ duration: 0.6, delay: 1.4 }}
                 >
                   <div className="mb-4">
-                    <div className="text-3xl font-bold text-gray-900">₹{startingPrice} - ₹2599</div>
+                    <div className="text-3xl font-bold text-gray-900">₹{startingPrice} - ₹3597</div>
                     <div className="text-sm text-gray-500">Choose 1, 2, or 3 songs</div>
                     {isEarlyBird && !isWorkshopFull && (
                       <div className="text-sm text-green-600 font-medium mt-1">
                         ✨ Early bird pricing for first 30 registrations
                       </div>
                     )}
-                    {/* {workshopData.revenue > 0 && (
-                      <div className="text-xs text-gray-500 mt-1">
-                        ₹{workshopData.revenue.toLocaleString()} collected so far
-                      </div>
-                    )} */}
                   </div>
                   
                   <motion.div

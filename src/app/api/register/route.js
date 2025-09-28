@@ -303,3 +303,65 @@ export async function PATCH(request) {
     );
   }
 }
+
+// Add this DELETE method to your existing /api/register/route.js file
+
+export async function DELETE(request) {
+  try {
+    const prismaClient = await getPrisma();
+    if (!prismaClient) {
+      return NextResponse.json(
+        { error: "Database connection failed" },
+        { status: 500 }
+      );
+    }
+
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Registration ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if registration exists
+    const existingRegistration = await prismaClient.registration.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!existingRegistration) {
+      return NextResponse.json(
+        { error: "Registration not found" },
+        { status: 404 }
+      );
+    }
+
+    // Delete the registration
+    await prismaClient.registration.delete({
+      where: { id: parseInt(id) },
+    });
+
+    console.log("Registration deleted:", id);
+
+    return NextResponse.json({
+      message: "Registration deleted successfully",
+      deletedId: parseInt(id),
+    });
+  } catch (error) {
+    console.error("Error deleting registration:", error);
+    
+    // Handle foreign key constraints if any
+    if (error.code === "P2003") {
+      return NextResponse.json(
+        { error: "Cannot delete registration due to related records" },
+        { status: 409 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}

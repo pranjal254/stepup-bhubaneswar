@@ -18,6 +18,7 @@ import {
   EyeOff,
   LogOut,
   RefreshCw,
+  Trash2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -45,52 +46,55 @@ export default function MembersPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  // Delete confirmation state
+  const [deleteConfirmation, setDeleteConfirmation] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Song mapping with complete details
   const songOptions = [
-    { id: 'chuttamalle', name: 'Chuttamalle', time: '12:00 PM', style: 'Hip Hop Fusion' },
-    { id: 'ramta-jogi', name: 'Ramta Jogi', time: '3:00 PM', style: 'Contemporary' },
-    { id: 'chaudhary', name: 'Chaudhary', time: '5:00 PM', style: 'Bollywood' }
+    { id: 'chuttamalle', name: 'Chuttamalle', time: '2:00 PM', style: 'Hip Hop Fusion' },
+    { id: 'ramta-jogi', name: 'Ramta Jogi', time: '4:00 PM', style: 'Contemporary' },
+    { id: 'chaudhary', name: 'Chaudhary', time: '7:00 PM', style: 'Bollywood' }
   ];
 
   const songNames = {
-    chuttamalle: "Chuttamalle (12PM)",
-    "ramta-jogi": "Ramta Jogi (3PM)",
-    chaudhary: "Chaudhary (5PM)",
+    chuttamalle: "Chuttamalle (2PM)",
+    "ramta-jogi": "Ramta Jogi (4PM)",
+    chaudhary: "Chaudhary (7PM)",
   };
 
   // Helper function to get selected songs display
-  // Updated function to handle the selectedSongs properly
-const getSelectedSongsDisplay = (selectedSongs, songCount) => {
-  // Handle case where all 3 songs are selected
-  if (songCount === 3) {
-    return "All 3 Songs (Chuttamalle, Ramta Jogi, Chaudhary)";
-  }
-
-  // Handle case where selectedSongs is null or undefined
-  if (!selectedSongs) {
-    return "Not specified";
-  }
-
-  try {
-    // Parse the JSON string from database
-    let parsed;
-    if (typeof selectedSongs === 'string') {
-      parsed = JSON.parse(selectedSongs);
-    } else {
-      parsed = selectedSongs;
+  const getSelectedSongsDisplay = (selectedSongs, songCount) => {
+    // Handle case where all 3 songs are selected
+    if (songCount === 3) {
+      return "All 3 Songs (Chuttamalle, Ramta Jogi, Chaudhary)";
     }
 
-    // Check if it's a valid array with items
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      return parsed.map(songId => songNames[songId] || songId).join(", ");
+    // Handle case where selectedSongs is null or undefined
+    if (!selectedSongs) {
+      return "Not specified";
     }
-    
-    return "Not specified";
-  } catch (error) {
-    console.error('Error parsing selectedSongs:', error, selectedSongs);
-    return "Error parsing songs";
-  }
-};
+
+    try {
+      // Parse the JSON string from database
+      let parsed;
+      if (typeof selectedSongs === 'string') {
+        parsed = JSON.parse(selectedSongs);
+      } else {
+        parsed = selectedSongs;
+      }
+
+      // Check if it's a valid array with items
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed.map(songId => songNames[songId] || songId).join(", ");
+      }
+      
+      return "Not specified";
+    } catch (error) {
+      console.error('Error parsing selectedSongs:', error, selectedSongs);
+      return "Error parsing songs";
+    }
+  };
 
   // Check authentication on load
   useEffect(() => {
@@ -158,6 +162,35 @@ const getSelectedSongsDisplay = (selectedSongs, songCount) => {
     setIsRefreshing(true);
     await fetchMembers();
     setIsRefreshing(false);
+  };
+
+  // Delete member function
+  const handleDeleteMember = async (memberId) => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch("/api/register", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id: memberId }),
+      });
+
+      if (response.ok) {
+        await fetchMembers(); // Refresh the data
+        setDeleteConfirmation(null); // Close the confirmation modal
+        // Optional: Show success message
+        // You could add a toast notification here
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete member: ${errorData.error}`);
+      }
+    } catch (error) {
+      console.error("Failed to delete member:", error);
+      alert("Error deleting member. Please try again.");
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   // Filter members based on search and filters
@@ -372,7 +405,6 @@ const getSelectedSongsDisplay = (selectedSongs, songCount) => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">Default: admin / stepup2024</p>
             <Link
               href="/"
               className="text-sm text-orange-600 hover:text-orange-700 mt-2 inline-block"
@@ -621,8 +653,16 @@ const getSelectedSongsDisplay = (selectedSongs, songCount) => {
                       <button
                         onClick={() => setSelectedMember(member)}
                         className="p-2 text-gray-400 hover:text-orange-500 transition-colors"
+                        title="View Details"
                       >
                         <Eye size={16} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirmation(member)}
+                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                        title="Delete Member"
+                      >
+                        <Trash2 size={16} />
                       </button>
                       {member.status === "pending" && (
                         <button
@@ -753,6 +793,13 @@ const getSelectedSongsDisplay = (selectedSongs, songCount) => {
                               title="View Details"
                             >
                               <Eye size={16} />
+                            </button>
+                            <button
+                              onClick={() => setDeleteConfirmation(member)}
+                              className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                              title="Delete Member"
+                            >
+                              <Trash2 size={16} />
                             </button>
                             {member.status === "pending" && (
                               <button
@@ -939,6 +986,100 @@ const getSelectedSongsDisplay = (selectedSongs, songCount) => {
                       Mark as Paid
                     </button>
                   )}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Delete Confirmation Modal */}
+        <AnimatePresence>
+          {deleteConfirmation && (
+            <motion.div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirmation(null)}
+            >
+              <motion.div
+                className="bg-white rounded-xl p-6 max-w-md w-full"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                    <Trash2 className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Delete Member
+                    </h3>
+                    <p className="text-sm text-gray-600">
+                      This action cannot be undone
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                  <p className="text-sm text-gray-700 mb-2">
+                    <strong>Name:</strong> {deleteConfirmation.name}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-2">
+                    <strong>Email:</strong> {deleteConfirmation.email}
+                  </p>
+                  <p className="text-sm text-gray-700 mb-2">
+                    <strong>Phone:</strong> {deleteConfirmation.phone}
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    <strong>Status:</strong>{" "}
+                    <span className="capitalize">{deleteConfirmation.status}</span>
+                  </p>
+                </div>
+
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <div className="flex items-start space-x-2">
+                    <X className="w-5 h-5 text-red-500 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-red-800">
+                        Warning
+                      </h4>
+                      <p className="text-sm text-red-700 mt-1">
+                        Deleting this member will permanently remove all their
+                        data including registration details, payment information,
+                        and transaction history. This action cannot be undone.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => setDeleteConfirmation(null)}
+                    disabled={isDeleting}
+                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleDeleteMember(deleteConfirmation.id)}
+                    disabled={isDeleting}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    {isDeleting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Deleting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Trash2 size={16} />
+                        <span>Delete Member</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </motion.div>
             </motion.div>

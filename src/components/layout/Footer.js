@@ -375,16 +375,7 @@ export default function Footer() {
           <div className="text-gray-400 text-sm text-center sm:text-right">
             <p>&copy; 2025 Step Up Bhubaneswar. All rights reserved.</p>
             <div className="flex space-x-4 mt-2 justify-center sm:justify-end">
-              <motion.div whileHover={{ y: -2 }}>
-                <Link href="/privacy" className="hover:text-orange-400 transition-colors">
-                  Privacy Policy
-                </Link>
-              </motion.div>
-              <motion.div whileHover={{ y: -2 }}>
-                <Link href="/terms" className="hover:text-orange-400 transition-colors">
-                  Terms of Service
-                </Link>
-              </motion.div>
+             
             </div>
           </div>
         </motion.div>

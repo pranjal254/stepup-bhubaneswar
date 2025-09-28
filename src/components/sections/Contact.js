@@ -454,31 +454,7 @@ export default function Contact() {
                 }}
               />
 
-              <div className="grid sm:grid-cols-2 gap-6 relative z-10">
-                <motion.div className="space-y-3" whileHover={{ x: 5 }}>
-                  <div className="flex items-center space-x-2">
-                    <Users className="w-5 h-5 text-orange-500" />
-                    <span className="font-semibold text-gray-900">
-                      Group Size
-                    </span>
-                  </div>
-                  <p className="text-gray-600">
-                    15-40 participants per workshop for personalized attention
-                  </p>
-                </motion.div>
-
-                <motion.div className="space-y-3" whileHover={{ x: 5 }}>
-                  <div className="flex items-center space-x-2">
-                    <Clock className="w-5 h-5 text-orange-500" />
-                    <span className="font-semibold text-gray-900">
-                      Duration
-                    </span>
-                  </div>
-                  <p className="text-gray-600">
-                    Weekend workshops: 2 days, 6-8 hours of intensive training
-                  </p>
-                </motion.div>
-              </div>
+             
             </motion.div>
 
             {/* CTA */}

@@ -41,7 +41,7 @@ export default function RegisterPage() {
     title: "Dance Workshop with Anvi Shetty",
     choreographer: "Anvi Shetty",
     date: "September 21, 2025",
-    time: "12:00 PM - 7:00 PM",
+    time: "2:00 PM - 9:00 PM",
     venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
   };
 
@@ -56,30 +56,30 @@ export default function RegisterPage() {
     {
       id: "chuttamalle",
       name: "Chuttamalle",
-      time: "12:00 PM",
+      time: "2:00 PM",
       style: "Hip Hop Fusion",
     },
     {
       id: "ramta-jogi",
       name: "Ramta Jogi",
-      time: "3:00 PM",
+      time: "4:00 PM",
       style: "Contemporary",
     },
-    { id: "chaudhary", name: "Chaudhary", time: "5:00 PM", style: "Bollywood" },
+    { id: "chaudhary", name: "Chaudhary", time: "7:00 PM", style: "Bollywood" },
   ];
 
   // Get current pricing (this would come from API in real implementation)
-  const [currentRegistrations, setCurrentRegistrations] = useState(31);
+  const [currentRegistrations, setCurrentRegistrations] = useState(32);
 
   const getPricing = (songCount) => {
     const isEarlyBird = currentRegistrations < 30;
 
     if (songCount === 1) {
-      return isEarlyBird ? 899 : 949;
+      return isEarlyBird ? 899 : 1199;
     } else if (songCount === 2) {
-      return isEarlyBird ? 1649 : 1749;
+      return isEarlyBird ? 1649 : 2398;
     } else if (songCount === 3) {
-      return isEarlyBird ? 2449 : 2449;
+      return isEarlyBird ? 2449 : 3597;
     }
   };
 
