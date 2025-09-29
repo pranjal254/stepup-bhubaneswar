@@ -42,6 +42,7 @@ export default function MembersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterSongs, setFilterSongs] = useState("all");
+  const [filterWorkshop, setFilterWorkshop] = useState("all");
   const [selectedMember, setSelectedMember] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -52,22 +53,40 @@ export default function MembersPage() {
 
   // Song mapping with complete details
   const songOptions = [
-    { id: 'chuttamalle', name: 'Chuttamalle', time: '2:00 PM', style: 'Hip Hop Fusion' },
-    { id: 'ramta-jogi', name: 'Ramta Jogi', time: '4:00 PM', style: 'Contemporary' },
-    { id: 'chaudhary', name: 'Chaudhary', time: '7:00 PM', style: 'Bollywood' }
+    { 
+      id: 'sajda', 
+      name: 'Sajda', 
+      time: '12:00 PM - 2:00 PM', 
+      style: 'Hip Hop Fusion',
+      price: 1000
+    },
+    { 
+      id: 'apsara-aali', 
+      name: 'Apsara Aali', 
+      time: '2:30 PM - 5:30 PM', 
+      style: 'Contemporary',
+      price: 1200
+    },
+    { 
+      id: 'piya-ghar-aayenge', 
+      name: 'Piya ghar aayenge', 
+      time: '6:00 PM - 8:00 PM', 
+      style: 'Bollywood',
+      price: 1000
+    }
   ];
 
   const songNames = {
-    chuttamalle: "Chuttamalle (2PM)",
-    "ramta-jogi": "Ramta Jogi (4PM)",
-    chaudhary: "Chaudhary (7PM)",
+    sajda: "Sajda (12PM-2PM)",
+    "apsara-aali": "Apsara Aali (2:30PM-5:30PM)",
+    "piya-ghar-aayenge": "Piya ghar aayenge (6PM-8PM)",
   };
 
   // Helper function to get selected songs display
   const getSelectedSongsDisplay = (selectedSongs, songCount) => {
     // Handle case where all 3 songs are selected
     if (songCount === 3) {
-      return "All 3 Songs (Chuttamalle, Ramta Jogi, Chaudhary)";
+      return "All 3 Songs (Sajda, Apsara Aali, Piya ghar aayenge)";
     }
 
     // Handle case where selectedSongs is null or undefined
@@ -96,7 +115,7 @@ export default function MembersPage() {
     }
   };
 
-  // Check authentication on load
+  // Check authentication on load and fetch data when workshop filter changes
   useEffect(() => {
     const checkAuth = () => {
       const auth = localStorage.getItem("stepup_admin_auth");
@@ -107,7 +126,7 @@ export default function MembersPage() {
       setIsAuthLoading(false);
     };
     checkAuth();
-  }, []);
+  }, [filterWorkshop]); // Add filterWorkshop dependency
 
   // Authentication handlers
   const handleLogin = (e) => {
@@ -142,7 +161,8 @@ export default function MembersPage() {
   const fetchMembers = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/register");
+      const workshopParam = filterWorkshop !== "all" ? `?workshop=${filterWorkshop}` : "";
+      const response = await fetch(`/api/register${workshopParam}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Members data:', data);
@@ -267,10 +287,16 @@ export default function MembersPage() {
 
   // Export to CSV
   const exportToCSV = () => {
+    const getWorkshopName = () => {
+      if (filterWorkshop === "anvi-shetty") return "anvi-shetty";
+      if (filterWorkshop === "shivanshu-soni") return "shivanshu-soni";
+      return "all-workshops";
+    };
+    
     const csvContent = [
       [
         "Name",
-        "Email",
+        "Email", 
         "Phone",
         "Age",
         "Experience",
@@ -278,6 +304,7 @@ export default function MembersPage() {
         "Selected Songs",
         "Price",
         "Status",
+        "Workshop",
         "Registered At",
         "Transaction ID",
       ],
@@ -291,6 +318,7 @@ export default function MembersPage() {
         getSelectedSongsDisplay(member.selectedSongs, member.songs),
         member.price,
         member.status,
+        member.workshop || "anvi-shetty",
         new Date(member.registeredAt).toLocaleString(),
         member.transactionId || "N/A",
       ]),
@@ -302,7 +330,7 @@ export default function MembersPage() {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `anvi-shetty-workshop-${
+    a.download = `${getWorkshopName()}-workshop-${
       new Date().toISOString().split("T")[0]
     }.csv`;
     a.click();
@@ -339,7 +367,7 @@ export default function MembersPage() {
               <Lock className="text-white" size={24} />
             </motion.div>
             <h1 className="text-2xl font-bold text-gray-900">Admin Access</h1>
-            <p className="text-gray-600 mt-2">Anvi Shetty Workshop Dashboard</p>
+            <p className="text-gray-600 mt-2">Shivanshu Soni Workshop Dashboard</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -442,8 +470,45 @@ export default function MembersPage() {
             <h1 className="text-3xl font-bold text-gray-900">
               Workshop Members
             </h1>
-            <p className="text-gray-600">
-              Anvi Shetty Dance Workshop - September 21, 2024
+            <div className="flex items-center space-x-4 mt-4">
+              <span className="text-sm text-gray-600">Workshop:</span>
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setFilterWorkshop("all")}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    filterWorkshop === "all"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  All Workshops
+                </button>
+                <button
+                  onClick={() => setFilterWorkshop("anvi-shetty")}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    filterWorkshop === "anvi-shetty"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Anvi Shetty
+                </button>
+                <button
+                  onClick={() => setFilterWorkshop("shivanshu-soni")}
+                  className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                    filterWorkshop === "shivanshu-soni"
+                      ? "bg-white text-gray-900 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  Shivanshu Soni
+                </button>
+              </div>
+            </div>
+            <p className="text-gray-600 mt-2">
+              {filterWorkshop === "anvi-shetty" && "Anvi Shetty Dance Workshop - September 21, 2024"}
+              {filterWorkshop === "shivanshu-soni" && "Shivanshu Soni Dance Workshop - October 25, 2025"}
+              {filterWorkshop === "all" && "All Dance Workshops"}
             </p>
           </div>
           <div className="text-right">
