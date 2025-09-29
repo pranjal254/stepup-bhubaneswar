@@ -21,8 +21,8 @@ export default function Hero() {
     isLoading: true
   })
 
-  // Workshop date - September 21, 2025
-  const workshopDate = new Date('2025-09-21T10:00:00')
+  // Workshop date - October 25, 2025
+  const workshopDate = new Date('2025-10-25T10:00:00')
 
   // Fetch real registration data
   const fetchWorkshopData = async () => {
@@ -89,7 +89,7 @@ export default function Hero() {
   // Calculate pricing and availability
   const isEarlyBird = workshopData.totalRegistrations < 30
   const spotsLeft = workshopData.totalSlots - workshopData.totalRegistrations
-  const startingPrice = isEarlyBird ? 899 : 1199
+  const startingPrice = isEarlyBird ? 850 : 1000  // Updated base price for single song
   const isWorkshopFull = spotsLeft <= 0
   const isAlmostFull = spotsLeft <= 5 && spotsLeft > 0
 
@@ -211,7 +211,7 @@ export default function Hero() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.6, delay: 0.7 }}
                 >
-                  Anvi Shetty
+                  Shivanshu Soni
                 </motion.span>
               </motion.h1>
               
@@ -219,14 +219,14 @@ export default function Hero() {
                 className="text-xl text-gray-600 leading-relaxed max-w-lg"
                 variants={itemVariants}
               >
-                Join Mumbai's renowned choreographer for an intensive 3-song workshop. 
+                Shivanshu Soni is a celebrated Indian dancer known for blending classical grace with contemporary expression.
                 Choose your package and experience different dance styles in one amazing day!
               </motion.p>
             </motion.div>
 
             {/* Real-time Stats */}
             <motion.div 
-              className="grid grid-cols-3 gap-6"
+              className="grid grid-cols-2 gap-6"
               variants={containerVariants}
             >
               {[
@@ -236,12 +236,6 @@ export default function Hero() {
                   icon: <Music className="w-5 h-5" />, 
                   color: "text-orange-500" 
                 },
-                // { 
-                //   number: workshopData.isLoading ? "..." : `${workshopData.totalRegistrations}/${workshopData.totalSlots}`, 
-                //   label: "Registered", 
-                //   icon: <Users className="w-5 h-5" />, 
-                //   color: "text-pink-500" 
-                // },
                 { 
                   number: workshopData.isLoading ? "..." : `₹${startingPrice}`, 
                   label: isEarlyBird ? "Early Bird" : "Starting at", 
@@ -375,10 +369,10 @@ export default function Hero() {
                       transition: { duration: 0.5 }
                     }}
                   >
-                    <span className="text-white font-bold text-2xl">AS</span>
+                    <span className="text-white font-bold text-2xl">SS</span>
                   </motion.div>
                   <h3 className="text-2xl font-bold text-gray-900">Dance Workshop</h3>
-                  <p className="text-gray-600">with Anvi Shetty from Mumbai</p>
+                  <p className="text-gray-600">with Shivanshu Soni from Mumbai</p>
                 </motion.div>
 
                 {/* Workshop Details */}
@@ -390,11 +384,11 @@ export default function Hero() {
                 >
                   <div className="flex items-center space-x-4 text-gray-600">
                     <Calendar className="w-5 h-5 text-orange-500" />
-                    <span>September 21, 2025</span>
+                    <span>October 25, 2025</span>
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <Clock className="w-5 h-5 text-orange-500" />
-                    <span>2:00 PM - 9:00 PM</span>
+                    <span>12:00 PM - 8:00 PM</span>
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">
                     <MapPin className="w-5 h-5 text-orange-500" />
@@ -457,7 +451,7 @@ export default function Hero() {
                   transition={{ duration: 0.6, delay: 1.4 }}
                 >
                   <div className="mb-4">
-                    <div className="text-3xl font-bold text-gray-900">₹{startingPrice} - ₹3597</div>
+                    <div className="text-3xl font-bold text-gray-900">₹{startingPrice} - ₹3000</div>
                     <div className="text-sm text-gray-500">Choose 1, 2, or 3 songs</div>
                     {isEarlyBird && !isWorkshopFull && (
                       <div className="text-sm text-green-600 font-medium mt-1">

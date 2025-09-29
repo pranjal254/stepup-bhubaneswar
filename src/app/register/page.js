@@ -38,10 +38,10 @@ export default function RegisterPage() {
 
   // Workshop details
   const workshop = {
-    title: "Dance Workshop with Anvi Shetty",
-    choreographer: "Anvi Shetty",
-    date: "September 21, 2025",
-    time: "2:00 PM - 9:00 PM",
+    title: "Dance Workshop with",
+    choreographer: "Shivanshu Soni",
+    date: "October 25, 2025",
+    time: "12:00 PM - 8:00 PM",
     venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
   };
 
@@ -54,32 +54,57 @@ export default function RegisterPage() {
 
   const songOptions = [
     {
-      id: "chuttamalle",
-      name: "Chuttamalle",
-      time: "2:00 PM",
+      id: "sajda",
+      name: "Sajda",
+      time: "12:00 PM - 2:00 PM",
       style: "Hip Hop Fusion",
+      price: 1000,
+      description: "High-energy hip hop choreography with contemporary elements"
     },
     {
-      id: "ramta-jogi",
-      name: "Ramta Jogi",
-      time: "4:00 PM",
+      id: "apsara-aali",
+      name: "Apsara Aali",
+      time: "2:30 PM - 5:30 PM",
       style: "Contemporary",
+      price: 1200,
+      description: "Graceful contemporary moves with traditional Indian dance elements"
     },
-    { id: "chaudhary", name: "Chaudhary", time: "7:00 PM", style: "Bollywood" },
+    { 
+      id: "piya-ghar-aayenge", 
+      name: "Piya ghar aayenge", 
+      time: "6:00 PM - 8:00 PM", 
+      style: "Bollywood",
+      price: 1000,
+      description: "Classic Bollywood choreography with dramatic expressions"
+    },
   ];
 
   // Get current pricing (this would come from API in real implementation)
-  const [currentRegistrations, setCurrentRegistrations] = useState(32);
+  const [currentRegistrations, setCurrentRegistrations] = useState(0);
 
-  const getPricing = (songCount) => {
+  const getPricing = (songCount, selectedSongs = []) => {
     const isEarlyBird = currentRegistrations < 30;
 
     if (songCount === 1) {
-      return isEarlyBird ? 899 : 1199;
+      // Check if Apsara Ali is selected (higher price)
+      const isApsaraSelected = selectedSongs.includes("apsara-aali");
+      if (isApsaraSelected) {
+        return isEarlyBird ? 1200 : 1400;
+      } else {
+        return isEarlyBird ? 1000 : 1200;
+      }
     } else if (songCount === 2) {
-      return isEarlyBird ? 1649 : 2398;
+      // For 2 songs, calculate based on selection
+      let basePrice = 0;
+      if (selectedSongs.includes("apsara-aali")) {
+        basePrice = isEarlyBird ? 1200 : 1400; // Apsara Ali
+        basePrice += isEarlyBird ? 1000 : 1200; // Other song
+      } else {
+        basePrice = (isEarlyBird ? 1000 : 1200) * 2; // Two regular songs
+      }
+      return basePrice;
     } else if (songCount === 3) {
-      return isEarlyBird ? 2449 : 3597;
+      return 3000; // Fixed combo price
     }
   };
 
@@ -150,10 +175,10 @@ export default function RegisterPage() {
     }
 
     if (formData.songs < 3 && formData.selectedSongs.length !== formData.songs) {
-    setError(`Please select exactly ${formData.songs} song${formData.songs > 1 ? 's' : ''}`)
-    setIsLoading(false)
-    return
-  }
+      setError(`Please select exactly ${formData.songs} song${formData.songs > 1 ? 's' : ''}`)
+      setIsLoading(false)
+      return
+    }
 
     try {
       const response = await fetch("/api/register", {
@@ -162,9 +187,9 @@ export default function RegisterPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-        ...formData,
-        selectedSongs: formData.songs === 3 ? songOptions.map(s => s.id) : formData.selectedSongs
-      })
+          ...formData,
+          selectedSongs: formData.songs === 3 ? songOptions.map(s => s.id) : formData.selectedSongs
+        })
       });
 
       const data = await response.json();
@@ -222,7 +247,7 @@ export default function RegisterPage() {
               Register for Workshop
             </h1>
             <p className="text-gray-600">
-              Join Anvi Shetty's dance workshop in just 2 simple steps
+              Join Shivanshu Soni's dance workshop in just 2 simple steps
             </p>
           </div>
         </motion.div>
@@ -352,11 +377,11 @@ export default function RegisterPage() {
                         </div>
                         <div className="text-right">
                           <div className="font-bold text-orange-500">
-                            ₹{getPricing(songCount)}
+                            ₹{getPricing(songCount, formData.selectedSongs)}
                           </div>
                           {songCount === 3 && (
                             <div className="text-xs text-green-600 font-medium">
-                              Most Popular
+                              Best Value
                             </div>
                           )}
                         </div>
@@ -375,7 +400,7 @@ export default function RegisterPage() {
                         {songOptions.map((song) => (
                           <label
                             key={song.id}
-                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer text-sm transition-all ${
+                            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer text-sm transition-all ${
                               formData.selectedSongs.includes(song.id)
                                 ? "bg-orange-100 border border-orange-300"
                                 : "bg-gray-50 border border-gray-200 hover:bg-gray-100"
@@ -386,7 +411,7 @@ export default function RegisterPage() {
                                 : ""
                             }`}
                           >
-                            <div className="flex items-center space-x-2">
+                            <div className="flex items-start space-x-3">
                               <input
                                 type="checkbox"
                                 checked={formData.selectedSongs.includes(
@@ -398,16 +423,28 @@ export default function RegisterPage() {
                                   formData.selectedSongs.length >=
                                     formData.songs
                                 }
-                                className="text-orange-500 focus:ring-orange-500"
+                                className="text-orange-500 focus:ring-orange-500 mt-1"
                               />
-                              <div>
-                                <div className="font-medium text-gray-900">
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900 mb-1">
                                   {song.name}
                                 </div>
-                                <div className="text-xs text-gray-500">
-                                  {song.time} 
+                                <div className="text-xs text-gray-500 mb-1">
+                                  <Clock className="w-3 h-3 inline mr-1" />
+                                  {song.time}
+                                </div>
+                                <div className="text-xs text-orange-600 mb-1">
+                                  {song.style}
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  {song.description}
                                 </div>
                               </div>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-orange-500 font-bold text-sm">
+                                ₹{song.price}
+                              </span>
                             </div>
                           </label>
                         ))}
@@ -427,10 +464,14 @@ export default function RegisterPage() {
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium">Total Amount:</span>
                     <span className="text-2xl font-bold text-orange-500">
-                      ₹{getPricing(formData.songs)}
+                      ₹{getPricing(formData.songs, formData.selectedSongs)}
                     </span>
                   </div>
-                  
+                  {formData.songs === 3 && (
+                    <div className="text-xs text-green-600 font-medium">
+                      You save ₹{songOptions.reduce((sum, song) => sum + song.price, 0) - 3000} with the combo!
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -677,7 +718,7 @@ export default function RegisterPage() {
                                 name to:
                               </p>
                               <a
-                                href={`${contact.whatsappUrl}?text=Hi! I just completed payment for Anvi Shetty's workshop. My name is ${registrationData.name}. Here's my payment screenshot.`}
+                                href={`${contact.whatsappUrl}?text=Hi! I just completed payment for Shivanshu Soni's workshop. My name is ${registrationData.name}. Here's my payment screenshot.`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center space-x-2 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors"
@@ -729,7 +770,6 @@ export default function RegisterPage() {
                           <li>
                             • Workshop venue details will be shared in the group
                           </li>
-
                           <li>
                             • Bring comfortable clothes, water bottle, and towel
                           </li>
@@ -748,7 +788,7 @@ export default function RegisterPage() {
                           Edit Details
                         </button>
                         <a
-                          href={`${contact.whatsappUrl}?text=Hi! I just completed payment for Anvi Shetty's workshop. My name is ${registrationData.name}. Here's my payment screenshot.`}
+                          href={`${contact.whatsappUrl}?text=Hi! I just completed payment for Shivanshu Soni's workshop. My name is ${registrationData.name}. Here's my payment screenshot.`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors text-center flex items-center justify-center space-x-2"

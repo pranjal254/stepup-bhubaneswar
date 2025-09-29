@@ -27,7 +27,7 @@ export async function POST(request) {
     }
 
     const data = await request.json();
-    const { name, email, phone, age, experience, songs, selectedSongs } = data;
+    const { name, email, phone, age, experience, songs, selectedSongs, workshop = "shivanshu-soni" } = data;
 
     // Validate required fields
     if (!name || !email || !phone || !age || !songs) {
@@ -43,32 +43,54 @@ export async function POST(request) {
       );
     }
 
-    // Check if email or phone already exists
+    // Check if email or phone already exists for this workshop
     const existingRegistration = await prismaClient.registration.findFirst({
       where: {
-        OR: [{ email: email.toLowerCase() }, { phone: phone }],
+        AND: [
+          {
+            OR: [{ email: email.toLowerCase() }, { phone: phone }],
+          },
+          { workshop: workshop }
+        ]
       },
     });
 
     if (existingRegistration) {
       return NextResponse.json(
-        { error: "Email or phone number already registered" },
+        { error: "Email or phone number already registered for this workshop" },
         { status: 409 }
       );
     }
 
-    // Get current registration count for pricing
-    const currentRegistrations = await prismaClient.registration.count();
+    // Get current registration count for pricing (for this specific workshop)
+    const currentRegistrations = await prismaClient.registration.count({
+      where: { workshop: workshop }
+    });
     const isEarlyBird = currentRegistrations < 30;
 
-    // Calculate pricing
+    // Calculate pricing - Updated for Shivanshu Soni
     let price;
     if (songs === 1) {
-      price = isEarlyBird ? 899 : 949;
+      // Check if Apsara Ali is selected (higher price)
+      const isApsaraSelected = selectedSongs && selectedSongs.includes("apsara-aali");
+      if (isApsaraSelected) {
+        price = isEarlyBird ? 1200 : 1400;
+      } else {
+        price = isEarlyBird ? 1000 : 1200;
+      }
     } else if (songs === 2) {
-      price = isEarlyBird ? 1649 : 1749;
+      // For 2 songs, calculate based on selection
+      let basePrice = 0;
+      if (selectedSongs && selectedSongs.includes("apsara-aali")) {
+        basePrice = isEarlyBird ? 1200 : 1400; // Apsara Ali
+        const otherSong = selectedSongs.find(s => s !== "apsara-aali");
+        basePrice += isEarlyBird ? 1000 : 1200; // Other song
+      } else {
+        basePrice = (isEarlyBird ? 1000 : 1200) * 2; // Two regular songs
+      }
+      price = basePrice;
     } else if (songs === 3) {
-      price = isEarlyBird ? 2449 : 2449;
+      price = 3000; // Fixed combo price
     } else {
       return NextResponse.json(
         { error: "Invalid song count" },
@@ -88,6 +110,7 @@ export async function POST(request) {
         selectedSongs: JSON.stringify(selectedSongs || []),
         price,
         status: "PENDING",
+        workshop: workshop, // Add workshop identifier
       },
     });
 
@@ -103,6 +126,7 @@ export async function POST(request) {
           songs: newRegistration.songs,
           price: newRegistration.price,
           status: newRegistration.status,
+          workshop: newRegistration.workshop,
         },
       },
       { status: 201 }
@@ -138,6 +162,7 @@ export async function GET(request) {
     const url = new URL(request.url);
     const status = url.searchParams.get("status");
     const songs = url.searchParams.get("songs");
+    const workshop = url.searchParams.get("workshop") || "all"; // Add workshop filter
 
     let where = {};
 
@@ -147,6 +172,10 @@ export async function GET(request) {
 
     if (songs && songs !== "all") {
       where.songs = parseInt(songs);
+    }
+
+    if (workshop && workshop !== "all") {
+      where.workshop = workshop;
     }
 
     // Fetch registrations with filters
@@ -163,7 +192,7 @@ export async function GET(request) {
         age: true,
         experience: true,
         songs: true,
-        selectedSongs: true, // Make sure this is included
+        selectedSongs: true,
         price: true,
         status: true,
         transactionId: true,
@@ -171,17 +200,20 @@ export async function GET(request) {
         paidAt: true,
         registeredAt: true,
         notes: true,
+        workshop: true, // Include workshop field
       },
     });
 
-    // Calculate stats
+    // Calculate stats (optionally filtered by workshop)
+    const statsWhere = workshop && workshop !== "all" ? { workshop } : {};
+    
     const [totalCount, paidCount, pendingCount, revenueResult] =
       await Promise.all([
-        prismaClient.registration.count(),
-        prismaClient.registration.count({ where: { status: "PAID" } }),
-        prismaClient.registration.count({ where: { status: "PENDING" } }),
+        prismaClient.registration.count({ where: statsWhere }),
+        prismaClient.registration.count({ where: { ...statsWhere, status: "PAID" } }),
+        prismaClient.registration.count({ where: { ...statsWhere, status: "PENDING" } }),
         prismaClient.registration.aggregate({
-          where: { status: "PAID" },
+          where: { ...statsWhere, status: "PAID" },
           _sum: { price: true },
         }),
       ]);
@@ -193,13 +225,13 @@ export async function GET(request) {
       revenue: revenueResult._sum.price || 0,
     };
 
-    // Format registrations for frontend - KEEP selectedSongs as is
+    // Format registrations for frontend
     const formattedRegistrations = registrations.map((reg) => ({
       ...reg,
       experience: reg.experience.toLowerCase(),
       status: reg.status.toLowerCase(),
       paymentMethod: reg.paymentMethod?.toLowerCase() || null,
-      // Don't modify selectedSongs here - keep it as stored in DB
+      workshop: reg.workshop || "anvi-shetty", // Default to anvi-shetty for existing records
     }));
 
     return NextResponse.json({
@@ -215,7 +247,6 @@ export async function GET(request) {
   }
 }
 
-// ... rest of PATCH and DELETE methods with same error handling pattern
 export async function PATCH(request) {
   try {
     const prismaClient = await getPrisma();
@@ -289,6 +320,7 @@ export async function PATCH(request) {
       experience: updatedRegistration.experience.toLowerCase(),
       status: updatedRegistration.status.toLowerCase(),
       paymentMethod: updatedRegistration.paymentMethod?.toLowerCase() || null,
+      workshop: updatedRegistration.workshop || "anvi-shetty",
     };
 
     return NextResponse.json({
@@ -303,8 +335,6 @@ export async function PATCH(request) {
     );
   }
 }
-
-// Add this DELETE method to your existing /api/register/route.js file
 
 export async function DELETE(request) {
   try {
