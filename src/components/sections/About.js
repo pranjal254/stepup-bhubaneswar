@@ -101,11 +101,11 @@ export default function About() {
                 </h2>
                 
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  Step Up Bhubaneswar is Odisha's first curated dance workshop platform designed for anyone who loves to dance — no age, no experience limit. We bring top choreographers from across India to Bhubaneswar for high-energy, weekend-based dance sessions.
+                  Step Up Bhubaneswar is Odisha's first curated dance workshop platform designed for anyone who loves to dance no age, no experience limit. We bring top choreographers from across India to Bhubaneswar for high-energy, weekend-based dance sessions.
                 </p>
                 
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  Whether you're a working professional, a student, or a homemaker, our workshops are crafted to inspire movement, joy, and community. More than a class — it's a celebration of dance for the people, by the people.
+                  Whether you're a working professional, a student, or a homemaker, our workshops are crafted to inspire movement, joy, and community. More than a class it's a celebration of dance for the people, by the people.
                 </p>
               </div>
 
@@ -126,7 +126,7 @@ export default function About() {
               <div className="bg-gradient-to-r from-orange-50 to-pink-50 rounded-2xl p-6 border border-orange-100">
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
                 <p className="text-gray-700 leading-relaxed">
-                  To make Bhubaneswar a cultural dance hub that connects passionate individuals — regardless of age or background — with India's finest choreographers, building a vibrant, inclusive dance culture where every workshop inspires a spark.
+                  To make Bhubaneswar a cultural dance hub that connects passionate individuals regardless of age or background with India's finest choreographers, building a vibrant, inclusive dance culture where every workshop inspires a spark.
                 </p>
               </div>
             </div>
@@ -168,11 +168,11 @@ export default function About() {
                 </h2>
                 
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  Step Up Bhubaneswar is Odisha's first curated dance workshop platform designed for anyone who loves to dance — no age, no experience limit. We bring top choreographers from across India to Bhubaneswar for high-energy, weekend-based dance sessions.
+                  Step Up Bhubaneswar is Odisha's first curated dance workshop platform designed for anyone who loves to dance no age, no experience limit. We bring top choreographers from across India to Bhubaneswar for high-energy, weekend-based dance sessions.
                 </p>
                 
                 <p className="text-lg text-gray-600 leading-relaxed">
-                  Whether you're a working professional, a student, or a homemaker, our workshops are crafted to inspire movement, joy, and community. More than a class — it's a celebration of dance for the people, by the people.
+                  Whether you're a working professional, a student, or a homemaker, our workshops are crafted to inspire movement, joy, and community. More than a class, it's a celebration of dance for the people, by the people.
                 </p>
               </div>
 
@@ -222,7 +222,7 @@ export default function About() {
               >
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
                 <p className="text-gray-700 leading-relaxed">
-                  To make Bhubaneswar a cultural dance hub that connects passionate individuals — regardless of age or background — with India's finest choreographers, building a vibrant, inclusive dance culture where every workshop inspires a spark.
+                  To make Bhubaneswar a cultural dance hub that connects passionate individuals regardless of age or background with India's finest choreographers, building a vibrant, inclusive dance culture where every workshop inspires a spark.
                 </p>
               </motion.div>
             </motion.div>

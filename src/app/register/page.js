@@ -433,12 +433,12 @@ export default function RegisterPage() {
                                   <Clock className="w-3 h-3 inline mr-1" />
                                   {song.time}
                                 </div>
-                                <div className="text-xs text-orange-600 mb-1">
+                                {/* <div className="text-xs text-orange-600 mb-1">
                                   {song.style}
                                 </div>
                                 <div className="text-xs text-gray-600">
                                   {song.description}
-                                </div>
+                                </div> */}
                               </div>
                             </div>
                             <div className="text-right">
