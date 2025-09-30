@@ -43,50 +43,20 @@ export async function POST(request) {
       );
     }
 
-    // Check if email or phone already exists for this workshop
-    const existingRegistration = await prismaClient.registration.findFirst({
-      where: {
-        AND: [
-          {
-            OR: [{ email: email.toLowerCase() }, { phone: phone }],
-          },
-          { workshop: workshop }
-        ]
-      },
-    });
-
-    if (existingRegistration) {
-      return NextResponse.json(
-        { error: "Email or phone number already registered for this workshop" },
-        { status: 409 }
-      );
-    }
-
-    // Get current registration count for pricing (for this specific workshop)
-    const currentRegistrations = await prismaClient.registration.count({
-      where: { workshop: workshop }
-    });
-    const isEarlyBird = currentRegistrations < 30;
-
-    // Calculate pricing - Updated for Shivanshu Soni
+    // Calculate pricing - Fixed pricing without early bird
     let price;
     if (songs === 1) {
       // Check if Apsara Ali is selected (higher price)
       const isApsaraSelected = selectedSongs && selectedSongs.includes("apsara-aali");
-      if (isApsaraSelected) {
-        price = isEarlyBird ? 1200 : 1400;
-      } else {
-        price = isEarlyBird ? 1000 : 1200;
-      }
+      price = isApsaraSelected ? 1200 : 1000;
     } else if (songs === 2) {
       // For 2 songs, calculate based on selection
       let basePrice = 0;
       if (selectedSongs && selectedSongs.includes("apsara-aali")) {
-        basePrice = isEarlyBird ? 1200 : 1400; // Apsara Ali
-        const otherSong = selectedSongs.find(s => s !== "apsara-aali");
-        basePrice += isEarlyBird ? 1000 : 1200; // Other song
+        basePrice = 1200; // Apsara Ali
+        basePrice += 1000; // Other song
       } else {
-        basePrice = (isEarlyBird ? 1000 : 1200) * 2; // Two regular songs
+        basePrice = 1000 * 2; // Two regular songs
       }
       price = basePrice;
     } else if (songs === 3) {
@@ -98,7 +68,7 @@ export async function POST(request) {
       );
     }
 
-    // Create new registration
+    // Create new registration (removed duplicate check)
     const newRegistration = await prismaClient.registration.create({
       data: {
         name: name.trim(),
@@ -110,7 +80,7 @@ export async function POST(request) {
         selectedSongs: JSON.stringify(selectedSongs || []),
         price,
         status: "PENDING",
-        workshop: workshop, // Add workshop identifier
+        workshop: workshop,
       },
     });
 
@@ -134,14 +104,6 @@ export async function POST(request) {
   } catch (error) {
     console.error("Registration error:", error);
 
-    // Handle Prisma specific errors
-    if (error.code === "P2002") {
-      return NextResponse.json(
-        { error: "Email or phone number already registered" },
-        { status: 409 }
-      );
-    }
-
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -162,7 +124,7 @@ export async function GET(request) {
     const url = new URL(request.url);
     const status = url.searchParams.get("status");
     const songs = url.searchParams.get("songs");
-    const workshop = url.searchParams.get("workshop") || "all"; // Add workshop filter
+    const workshop = url.searchParams.get("workshop") || "all";
 
     let where = {};
 
@@ -200,7 +162,7 @@ export async function GET(request) {
         paidAt: true,
         registeredAt: true,
         notes: true,
-        workshop: true, // Include workshop field
+        workshop: true,
       },
     });
 
@@ -231,7 +193,7 @@ export async function GET(request) {
       experience: reg.experience.toLowerCase(),
       status: reg.status.toLowerCase(),
       paymentMethod: reg.paymentMethod?.toLowerCase() || null,
-      workshop: reg.workshop || "anvi-shetty", // Default to anvi-shetty for existing records
+      workshop: reg.workshop || "anvi-shetty",
     }));
 
     return NextResponse.json({
