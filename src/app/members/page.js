@@ -30,6 +30,8 @@ export default function MembersPage() {
   const [authForm, setAuthForm] = useState({ username: "", password: "" });
   const [authError, setAuthError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  // NEW: song-by-title filter
+  const [filterSongId, setFilterSongId] = useState("all");
 
   // Data state
   const [members, setMembers] = useState([]);
@@ -53,27 +55,27 @@ export default function MembersPage() {
 
   // Song mapping with complete details
   const songOptions = [
-    { 
-      id: 'sajda', 
-      name: 'Sajda', 
-      time: '12:00 PM - 2:00 PM', 
-      style: 'Hip Hop Fusion',
-      price: 1000
+    {
+      id: "sajda",
+      name: "Sajda",
+      time: "12:00 PM - 2:00 PM",
+      style: "Hip Hop Fusion",
+      price: 1000,
     },
-    { 
-      id: 'apsara-aali', 
-      name: 'Apsara Aali', 
-      time: '2:30 PM - 5:30 PM', 
-      style: 'Contemporary',
-      price: 1200
+    {
+      id: "apsara-aali",
+      name: "Apsara Aali",
+      time: "2:30 PM - 5:30 PM",
+      style: "Contemporary",
+      price: 1200,
     },
-    { 
-      id: 'piya-ghar-aayenge', 
-      name: 'Piya ghar aayenge', 
-      time: '6:00 PM - 8:00 PM', 
-      style: 'Bollywood',
-      price: 1000
-    }
+    {
+      id: "piya-ghar-aayenge",
+      name: "Piya ghar aayenge",
+      time: "6:00 PM - 8:00 PM",
+      style: "Bollywood",
+      price: 1000,
+    },
   ];
 
   const songNames = {
@@ -97,7 +99,7 @@ export default function MembersPage() {
     try {
       // Parse the JSON string from database
       let parsed;
-      if (typeof selectedSongs === 'string') {
+      if (typeof selectedSongs === "string") {
         parsed = JSON.parse(selectedSongs);
       } else {
         parsed = selectedSongs;
@@ -105,12 +107,12 @@ export default function MembersPage() {
 
       // Check if it's a valid array with items
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map(songId => songNames[songId] || songId).join(", ");
+        return parsed.map((songId) => songNames[songId] || songId).join(", ");
       }
-      
+
       return "Not specified";
     } catch (error) {
-      console.error('Error parsing selectedSongs:', error, selectedSongs);
+      console.error("Error parsing selectedSongs:", error, selectedSongs);
       return "Error parsing songs";
     }
   };
@@ -161,11 +163,12 @@ export default function MembersPage() {
   const fetchMembers = async () => {
     setIsLoading(true);
     try {
-      const workshopParam = filterWorkshop !== "all" ? `?workshop=${filterWorkshop}` : "";
+      const workshopParam =
+        filterWorkshop !== "all" ? `?workshop=${filterWorkshop}` : "";
       const response = await fetch(`/api/register${workshopParam}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Members data:', data);
+        console.log("Members data:", data);
         setMembers(data.registrations || []);
         setStats(data.stats || { total: 0, paid: 0, pending: 0, revenue: 0 });
       } else {
@@ -213,20 +216,6 @@ export default function MembersPage() {
     }
   };
 
-  // Filter members based on search and filters
-  const filteredMembers = members.filter((member) => {
-    const matchesSearch =
-      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.phone.includes(searchTerm);
-
-    const matchesStatus =
-      filterStatus === "all" || member.status === filterStatus;
-    const matchesSongs =
-      filterSongs === "all" || member.songs.toString() === filterSongs;
-
-    return matchesSearch && matchesStatus && matchesSongs;
-  });
 
   // Helper functions
   const getStatusColor = (status) => {
@@ -253,6 +242,31 @@ export default function MembersPage() {
       default:
         return <Clock className="w-4 h-4" />;
     }
+  };
+
+  // Parse the stored selectedSongs into an array of IDs safely
+  const parseSelectedSongIds = (selectedSongs) => {
+    if (!selectedSongs) return [];
+    try {
+      if (typeof selectedSongs === "string") {
+        const parsed = JSON.parse(selectedSongs);
+        return Array.isArray(parsed) ? parsed : [];
+      }
+      return Array.isArray(selectedSongs) ? selectedSongs : [];
+    } catch {
+      return [];
+    }
+  };
+
+  // Decide if a member should match a specific song filter
+  const memberHasSong = (member, songId) => {
+    if (songId === "all") return true;
+
+    // If they bought all 3 and you didn’t store explicit selections, treat as match-any
+    if (member.songs === 3 && !member.selectedSongs) return true;
+
+    const ids = parseSelectedSongIds(member.selectedSongs);
+    return ids.includes(songId);
   };
 
   // Mark member as paid
@@ -292,11 +306,11 @@ export default function MembersPage() {
       if (filterWorkshop === "shivanshu-soni") return "shivanshu-soni";
       return "all-workshops";
     };
-    
+
     const csvContent = [
       [
         "Name",
-        "Email", 
+        "Email",
         "Phone",
         "Age",
         "Experience",
@@ -337,6 +351,26 @@ export default function MembersPage() {
     window.URL.revokeObjectURL(url);
   };
 
+   // Filter members based on search and filters
+  const filteredMembers = members.filter((member) => {
+    const matchesSearch =
+      member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.phone.includes(searchTerm);
+
+    const matchesStatus =
+      filterStatus === "all" || member.status === filterStatus;
+
+    // Existing package-size filter (1/2/3 songs)
+    const matchesSongsCount =
+      filterSongs === "all" || member.songs.toString() === filterSongs;
+
+    // NEW: specific song filter (Sajda / Apsara Aali / Piya ghar aayenge)
+    const matchesSongId = memberHasSong(member, filterSongId);
+
+    return matchesSearch && matchesStatus && matchesSongsCount && matchesSongId;
+  });
+  
   // Loading screen
   if (isAuthLoading) {
     return (
@@ -367,7 +401,9 @@ export default function MembersPage() {
               <Lock className="text-white" size={24} />
             </motion.div>
             <h1 className="text-2xl font-bold text-gray-900">Admin Access</h1>
-            <p className="text-gray-600 mt-2">Shivanshu Soni Workshop Dashboard</p>
+            <p className="text-gray-600 mt-2">
+              Shivanshu Soni Workshop Dashboard
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
@@ -506,8 +542,10 @@ export default function MembersPage() {
               </div>
             </div>
             <p className="text-gray-600 mt-2">
-              {filterWorkshop === "anvi-shetty" && "Anvi Shetty Dance Workshop - September 21, 2024"}
-              {filterWorkshop === "shivanshu-soni" && "Shivanshu Soni Dance Workshop - October 25, 2025"}
+              {filterWorkshop === "anvi-shetty" &&
+                "Anvi Shetty Dance Workshop - September 21, 2024"}
+              {filterWorkshop === "shivanshu-soni" &&
+                "Shivanshu Soni Dance Workshop - October 25, 2025"}
               {filterWorkshop === "all" && "All Dance Workshops"}
             </p>
           </div>
@@ -635,6 +673,21 @@ export default function MembersPage() {
                 <option value="2">2 Songs</option>
                 <option value="3">3 Songs</option>
               </select>
+
+              {/* Song Title Filter */}
+              <select
+                value={filterSongId}
+                onChange={(e) => setFilterSongId(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                title="Filter by specific song"
+              >
+                <option value="all">All Songs</option>
+                {songOptions.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.name} ({s.time})
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Export Button */}
@@ -701,11 +754,16 @@ export default function MembersPage() {
                       <div className="flex items-center space-x-2">
                         <Music className="w-4 h-4 text-orange-500" />
                         <span>
-                          {member.songs} Song{member.songs > 1 ? "s" : ""} - ₹{member.price}
+                          {member.songs} Song{member.songs > 1 ? "s" : ""} - ₹
+                          {member.price}
                         </span>
                       </div>
                       <div className="text-xs text-gray-500 ml-6 bg-gray-50 p-2 rounded">
-                        <strong>Songs:</strong> {getSelectedSongsDisplay(member.selectedSongs, member.songs)}
+                        <strong>Songs:</strong>{" "}
+                        {getSelectedSongsDisplay(
+                          member.selectedSongs,
+                          member.songs
+                        )}
                       </div>
                     </div>
                   </div>
@@ -818,8 +876,12 @@ export default function MembersPage() {
                               </span>
                             </div>
                             <div className="text-xs text-gray-600 bg-gray-50 p-2 rounded max-w-xs">
-                              <strong>Selected:</strong><br />
-                              {getSelectedSongsDisplay(member.selectedSongs, member.songs)}
+                              <strong>Selected:</strong>
+                              <br />
+                              {getSelectedSongsDisplay(
+                                member.selectedSongs,
+                                member.songs
+                              )}
                             </div>
                           </div>
                         </td>
@@ -982,7 +1044,10 @@ export default function MembersPage() {
                     </label>
                     <div className="bg-gray-50 p-3 rounded-lg mt-1">
                       <p className="text-gray-900 text-sm">
-                        {getSelectedSongsDisplay(selectedMember.selectedSongs, selectedMember.songs)}
+                        {getSelectedSongsDisplay(
+                          selectedMember.selectedSongs,
+                          selectedMember.songs
+                        )}
                       </p>
                     </div>
                   </div>
@@ -1100,7 +1165,9 @@ export default function MembersPage() {
                   </p>
                   <p className="text-sm text-gray-700">
                     <strong>Status:</strong>{" "}
-                    <span className="capitalize">{deleteConfirmation.status}</span>
+                    <span className="capitalize">
+                      {deleteConfirmation.status}
+                    </span>
                   </p>
                 </div>
 
@@ -1113,8 +1180,9 @@ export default function MembersPage() {
                       </h4>
                       <p className="text-sm text-red-700 mt-1">
                         Deleting this member will permanently remove all their
-                        data including registration details, payment information,
-                        and transaction history. This action cannot be undone.
+                        data including registration details, payment
+                        information, and transaction history. This action cannot
+                        be undone.
                       </p>
                     </div>
                   </div>
