@@ -420,7 +420,7 @@ export default function Hero() {
                   <div className="flex items-center space-x-4 text-gray-600">
                     <MapPin className="w-5 h-5 text-orange-500" />
                     <span>
-                      Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar
+                      Girish School Of Performing Arts GA-15, 4th Floor, near Utkal hospital
                     </span>
                   </div>
                   <div className="flex items-center space-x-4 text-gray-600">

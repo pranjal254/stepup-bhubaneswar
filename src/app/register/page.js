@@ -41,7 +41,7 @@ export default function RegisterPage() {
     choreographer: "Shivanshu Soni",
     date: "October 25, 2025",
     time: "12:00 PM - 8:00 PM",
-    venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
+    venue: "Girish School Of Performing Arts GA-15, 4th Floor, near Utkal hospital",
   };
 
   // Contact details
