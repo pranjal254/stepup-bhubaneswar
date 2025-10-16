@@ -19,7 +19,7 @@ export default function Workshops() {
     location: "Mumbai",
     date: "October 25, 2025",
     time: "12:00 PM - 8:00 PM",
-    venue: "Oxy cafe and studios, IRC village, Nayapalli, Bhubaneswar",
+    venue: "Girish School Of Performing Arts GA-15, 4th Floor, near Utkal hospital, Bhubaneswar",
     totalSlots: 200,
     currentRegistrations: currentRegistrations,
     description: "An intensive dance workshop covering 3 amazing songs with different styles and techniques.",
